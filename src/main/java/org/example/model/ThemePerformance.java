@@ -1,37 +1,19 @@
 package org.example.model;
 
-public final class ThemePerformance {
+public record ThemePerformance(
+        String themeName,
+        double averageReturn,
+        String bestStock,
+        double bestStockReturn
+) {
 
-    private final String themeName;
-    private final double averageReturn;
+    public ThemePerformance {
+        if (themeName == null || themeName.isBlank()) {
+            throw new IllegalArgumentException("테마명은 비어 있을 수 없습니다.");
+        }
 
-    private final String bestStock;
-    private final double bestStockReturn;
-
-    public ThemePerformance(String themeName,
-                            double averageReturn,
-                            String bestStock,
-                            double bestStockReturn) {
-
-        this.themeName = themeName;
-        this.averageReturn = averageReturn;
-        this.bestStock = bestStock;
-        this.bestStockReturn = bestStockReturn;
-    }
-
-    public String getThemeName() {
-        return themeName;
-    }
-
-    public double getAverageReturn() {
-        return averageReturn;
-    }
-
-    public String getBestStock() {
-        return bestStock;
-    }
-
-    public double getBestStockReturn() {
-        return bestStockReturn;
+        if (bestStock == null || bestStock.isBlank()) {
+            throw new IllegalArgumentException("최고 종목명은 비어 있을 수 없습니다.");
+        }
     }
 }

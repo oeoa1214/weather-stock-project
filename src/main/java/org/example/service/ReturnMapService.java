@@ -6,10 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StockAnalysisService {
+public class ReturnMapService {
 
-    // Snapshot 기반 종목별 수익률 Map 생성
-    public Map<String, Double> calculateReturns(
+    public Map<String, Double> createReturnMap(
             List<StockSnapshot> snapshots
     ) {
 

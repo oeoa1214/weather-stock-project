@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.api.StockApiClient;
 import org.example.model.Stock;
 import org.example.model.StockSnapshot;
 
@@ -8,6 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MarketDataService {
+
+    private final StockPriceService priceService =
+            new StockPriceService();
+
+    private final ReturnRateService returnRateService =
+            new ReturnRateService();
 
     public List<StockSnapshot> createSnapshots(
             List<Stock> stocks) {
@@ -19,20 +24,25 @@ public final class MarketDataService {
 
             try {
 
-                final String json =
-                        StockApiClient.getStockData(
-                                stock.getSymbol()
-                        );
+                String json =
+                        priceService.getStockJson(stock);
 
                 final double currentPrice =
-                        StockApiClient.parseCurrentPrice(
-                                json
+                        priceService.getCurrentPrice(json);
+
+                List<Double> prices =
+                        priceService.getClosePrices(json);
+
+                double returnRate =
+                        returnRateService.calculateReturnRate(
+                                prices
                         );
 
                 snapshots.add(
                         new StockSnapshot(
                                 stock,
-                                currentPrice
+                                currentPrice,
+                                returnRate
                         )
                 );
 

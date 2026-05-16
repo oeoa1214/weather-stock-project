@@ -1,11 +1,16 @@
 package org.example.api;
 
 import org.example.model.WeatherData;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+
+//→ 날씨 API 호출
+//→ 미세먼지 API 호출
+//→ 날씨 JSON을 WeatherData로 변환
+
 
 public class WeatherApiClient {
 

@@ -1,10 +1,14 @@
 package org.example.model;
 
 public abstract class WeatherCondition {
-    protected String name;
-    protected int priority;
 
-    public WeatherCondition(String name, int priority) {
+    private final String name;
+    private final int priority;
+
+    public WeatherCondition(
+            String name,
+            int priority) {
+
         this.name = name;
         this.priority = priority;
     }
@@ -16,9 +20,4 @@ public abstract class WeatherCondition {
     public int getPriority() {
         return priority;
     }
-
-    public abstract String getThemeName();
-
-    public abstract String getFoodRecommendation();
 }
-

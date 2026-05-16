@@ -36,19 +36,19 @@ public class WeatherService {
 
     public WeatherCondition createConditionByData(WeatherData data) {
 
-        if (data.getPm10() >= 80) {
+        if (data.pm10() >= 80) {
             return new DustCondition();
         }
 
-        if (data.getPrecipitation() > 0) {
+        if (data.precipitation() > 0) {
             return new RainCondition();
         }
 
-        if (data.getTemperature() >= 30) {
+        if (data.temperature() >= 30) {
             return new HeatWaveCondition();
         }
 
-        if (data.getTemperature() <= 5) {
+        if (data.temperature() <= 5) {
             return new ColdWaveCondition();
         }
 

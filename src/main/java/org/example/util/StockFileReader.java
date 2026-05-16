@@ -60,9 +60,7 @@ public final class StockFileReader {
                         new Stock(
                                 name,
                                 symbol,
-                                theme,
-                                0.0,
-                                0.0
+                                theme
                         )
                 );
             }
