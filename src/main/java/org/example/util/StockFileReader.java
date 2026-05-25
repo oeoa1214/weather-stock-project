@@ -16,10 +16,9 @@ public final class StockFileReader {
     private StockFileReader() {
     }
 
-    public static List<Stock> loadStocksByTheme(
-            String targetTheme) {
+    public static List<Stock> loadAllStocks() {
 
-        final List<Stock> stocks =
+        List<Stock> stocks =
                 new ArrayList<>();
 
         try (BufferedReader br =
@@ -36,25 +35,21 @@ public final class StockFileReader {
                     continue;
                 }
 
-                final String[] parts =
+                String[] parts =
                         line.split(",");
 
                 if (parts.length < 3) {
                     continue;
                 }
 
-                final String theme =
+                String theme =
                         parts[0].trim();
 
-                final String name =
+                String name =
                         parts[1].trim();
 
-                final String symbol =
+                String symbol =
                         parts[2].trim();
-
-                if (!theme.equals(targetTheme)) {
-                    continue;
-                }
 
                 stocks.add(
                         new Stock(
@@ -66,12 +61,33 @@ public final class StockFileReader {
             }
 
         } catch (IOException e) {
-
-            System.out.println(
-                    "stocks.csv 읽기 실패"
+            throw new IllegalStateException(
+                    "stocks.csv 읽기 실패",
+                    e
             );
         }
 
         return stocks;
+    }
+
+    public static List<Stock> loadStocksByTheme(
+            String targetTheme
+    ) {
+        if (targetTheme == null || targetTheme.isBlank()) {
+            throw new IllegalArgumentException(
+                    "targetTheme은 비어 있을 수 없습니다."
+            );
+        }
+
+        List<Stock> result =
+                new ArrayList<>();
+
+        for (Stock stock : loadAllStocks()) {
+            if (stock.getTheme().equals(targetTheme)) {
+                result.add(stock);
+            }
+        }
+
+        return result;
     }
 }

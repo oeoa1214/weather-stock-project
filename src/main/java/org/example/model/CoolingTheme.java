@@ -1,11 +1,9 @@
 package org.example.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CoolingTheme extends ThemeStrategy {
+public class CoolingTheme extends themeMom {
 
     public CoolingTheme() {
-        super("냉방/전력");
+        super("냉방·여름소비");
     }
+
 }

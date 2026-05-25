@@ -2,104 +2,84 @@ package org.example.service;
 
 public class StockReasonService {
 
-    public String getReason(String stockName) {
-
-        if (stockName.equals("대한항공")) {
-            return "여행객 증가";
+    public String getReason(
+            String detailTheme,
+            String stockName
+    ) {
+        if (detailTheme == null) {
+            detailTheme = "";
         }
 
-        if (stockName.equals("하나투어")) {
-            return "여행 예약 증가";
+        if (stockName == null) {
+            stockName = "";
         }
 
-        if (stockName.equals("호텔신라")) {
-            return "호텔·면세점 소비 증가";
-        }
+        String key =
+                detailTheme + "|" + stockName;
 
-        if (stockName.equals("CJ CGV")) {
-            return "영화관 방문 증가";
-        }
+        return switch (key) {
 
-        if (stockName.equals("신세계")) {
-            return "백화점 소비 증가";
-        }
+            case "편의점·근거리 소비|BGF리테일",
+                 "편의점·근거리 소비|GS리테일" ->
+                    "비가 오는 날에는 근거리 소비 증가로 편의점 관련 수요가 증가합니다.";
 
-        if (stockName.equals("BGF리테일")) {
-            return "편의점 수요 증가";
-        }
+            case "간편식·식품|오뚜기",
+                 "간편식·식품|농심",
+                 "간편식·식품|CJ제일제당" ->
+                    "비가 오는 날에는 실내 식사 증가로 간편식·식품 수요가 증가합니다.";
 
-        if (stockName.equals("GS리테일")) {
-            return "실내 소비 증가";
-        }
+            case "항공·이동|대한항공" ->
+                    "맑은 날에는 이동 수요 증가로 항공 관련 서비스 수요가 증가합니다.";
 
-        if (stockName.equals("쿠팡")) {
-            return "온라인 주문 증가";
-        }
+            case "여행예약|하나투어" ->
+                    "맑은 날에는 외부 활동 증가로 여행 예약 수요가 증가합니다.";
 
-        if (stockName.equals("오뚜기")) {
-            return "간편식 수요 증가";
-        }
+            case "호텔·면세|호텔신라" ->
+                    "맑은 날에는 여행과 외출 증가로 호텔·면세 소비 수요가 증가합니다.";
 
-        if (stockName.equals("CJ대한통운")) {
-            return "배송 물량 증가";
-        }
+            case "영화·문화생활|CJ CGV" ->
+                    "맑은 날에는 문화생활 증가로 영화관 이용 수요가 증가합니다.";
 
-        if (stockName.equals("LG전자")) {
-            return "냉방·공기청정 가전 수요 증가";
-        }
+            case "백화점·유통|신세계" ->
+                    "맑은 날에는 외부 소비 증가로 백화점·유통 수요가 증가합니다.";
 
-        if (stockName.equals("삼성전자")) {
-            return "에어컨 판매 증가";
-        }
+            case "공기청정가전|위닉스",
+                 "공기청정가전|코웨이",
+                 "공기청정가전|LG전자" ->
+                    "미세먼지가 심한 날에는 실내 공기 관리 수요가 증가합니다.";
 
-        if (stockName.equals("한국전력")) {
-            return "냉방 전력 수요 증가";
-        }
+            case "위생소모품|케이엠",
+                 "생활위생용품|깨끗한나라" ->
+                    "미세먼지가 심한 날에는 위생용품과 생활 관리 수요가 증가합니다.";
 
-        if (stockName.equals("롯데칠성")) {
-            return "음료 소비 증가";
-        }
+            case "냉방가전|LG전자",
+                 "냉방가전|삼성전자" ->
+                    "폭염에는 냉방 가전 사용 증가로 관련 제품 수요가 증가합니다.";
 
-        if (stockName.equals("빙그레")) {
-            return "아이스크림 소비 증가";
-        }
+            case "전력수요|한국전력" ->
+                    "폭염에는 냉방 사용 증가로 전력 수요가 증가합니다.";
 
-        if (stockName.equals("한국가스공사")) {
-            return "난방 가스 수요 증가";
-        }
+            case "여름음료·생수|롯데칠성" ->
+                    "폭염에는 수분 보충 수요 증가로 음료·생수 소비가 증가합니다.";
 
-        if (stockName.equals("S-Oil")) {
-            return "난방 연료 수요 증가";
-        }
+            case "여름음료·빙과|빙그레" ->
+                    "폭염에는 시원한 식품 선호 증가로 빙과류 수요가 증가합니다.";
 
-        if (stockName.equals("SK이노베이션")) {
-            return "겨울 연료 수요 증가";
-        }
+            case "도시가스·난방|한국가스공사" ->
+                    "한파에는 난방 사용 증가로 도시가스 수요가 증가합니다.";
 
-        if (stockName.equals("경동나비엔")) {
-            return "보일러 수요 증가";
-        }
+            case "정유·연료|S-Oil",
+                 "정유·에너지|SK이노베이션" ->
+                    "한파에는 난방과 연료 사용 증가로 에너지 수요가 증가합니다.";
 
-        if (stockName.equals("롯데웰푸드")) {
-            return "겨울 간식 소비 증가";
-        }
+            case "보일러·난방기기|경동나비엔" ->
+                    "한파에는 실내 난방 증가로 보일러·난방기기 수요가 증가합니다.";
 
-        if (stockName.equals("위닉스")) {
-            return "공기청정기 수요 증가";
-        }
+            case "겨울간식·식품|롯데웰푸드" ->
+                    "한파에는 실내 간식 소비 증가로 겨울 식품 수요가 증가합니다.";
 
-        if (stockName.equals("코웨이")) {
-            return "실내 위생 수요 증가";
-        }
-
-        if (stockName.equals("케이엠")) {
-            return "마스크 수요 증가";
-        }
-
-        if (stockName.equals("깨끗한나라")) {
-            return "위생용품 수요 증가";
-        }
-
-        return "테마 수혜 기대";
+            default ->
+                    "현재 날씨 흐름과 소비 변화에 맞춰 관련 종목 수요가 증가할 수 있습니다.";
+        };
     }
 }

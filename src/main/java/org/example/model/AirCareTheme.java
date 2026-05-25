@@ -1,12 +1,9 @@
 package org.example.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class AirCareTheme extends ThemeStrategy {
+public class AirCareTheme extends themeMom {
 
     public AirCareTheme() {
-        super("공기청정/위생");
+        super("공기청정·위생");
     }
 
 }

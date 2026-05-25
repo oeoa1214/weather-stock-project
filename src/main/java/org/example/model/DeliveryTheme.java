@@ -1,12 +1,9 @@
 package org.example.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class DeliveryTheme extends ThemeStrategy {
+public class DeliveryTheme extends themeMom {
 
     public DeliveryTheme() {
-        super("배달/온라인");
+        super("편의점·간편식");
     }
 
 }
