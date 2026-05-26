@@ -141,9 +141,9 @@ public class MainFrame extends JFrame {
         );
 
         gridPanel.add(
-                createCard(
+                new CardPanel(
                         "5. 테마별 최근 7일 성과",
-                        createClass5Text(
+                        new Class5ScoreboardPanel(
                                 class5Result
                         )
                 )
@@ -382,7 +382,7 @@ public class MainFrame extends JFrame {
                 BorderLayout.CENTER
         );
 
-        centerPanel.add(
+        panel.add(
                 iconLabel,
                 BorderLayout.EAST
         );
@@ -461,24 +461,51 @@ public class MainFrame extends JFrame {
     private JPanel createThemeCard(
             Class4 class4
     ) {
-        Color themeColor =
-                getThemeDarkColor(
-                        class4.themeName()
-                );
-
         JPanel panel =
                 new JPanel(
                         new BorderLayout(10, 10)
-                );
+                ) {
+                    @Override
+                    protected void paintComponent(
+                            Graphics g
+                    ) {
+                        super.paintComponent(
+                                g
+                        );
 
-        panel.setBackground(
-                Color.WHITE
+                        java.awt.Graphics2D g2 =
+                                (java.awt.Graphics2D) g.create();
+
+                        g2.setRenderingHint(
+                                java.awt.RenderingHints.KEY_ANTIALIASING,
+                                java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                        );
+
+                        g2.setColor(
+                                new Color(255, 255, 255, 175)
+                        );
+
+                        g2.fillRoundRect(
+                                0,
+                                0,
+                                getWidth(),
+                                getHeight(),
+                                22,
+                                22
+                        );
+
+                        g2.dispose();
+                    }
+                };
+
+        panel.setOpaque(
+                false
         );
 
         panel.setBorder(
                 BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(
-                                CARD_BORDER_COLOR,
+                                new Color(205, 210, 215, 150),
                                 1
                         ),
                         BorderFactory.createEmptyBorder(
@@ -519,10 +546,6 @@ public class MainFrame extends JFrame {
                 new Color(35, 35, 35)
         );
 
-        textArea.setBackground(
-                Color.WHITE
-        );
-
         textArea.setEditable(
                 false
         );
@@ -535,20 +558,29 @@ public class MainFrame extends JFrame {
                 true
         );
 
-        JLabel icon =
-                new JLabel(
-                        getThemeIcon(
-                                class4.themeName()
-                        ),
-                        SwingConstants.CENTER
-                );
-
-        icon.setFont(
-                new Font("Segoe UI Emoji", Font.PLAIN, 44)
+        textArea.setOpaque(
+                false
         );
 
-        icon.setForeground(
-                themeColor
+        JPanel centerPanel =
+                new JPanel(
+                        new BorderLayout(10, 0)
+                );
+
+        centerPanel.setOpaque(
+                false
+        );
+
+        centerPanel.add(
+                textArea,
+                BorderLayout.CENTER
+        );
+
+        centerPanel.add(
+                new ThemeCharacterPanel(
+                        class4.themeName()
+                ),
+                BorderLayout.EAST
         );
 
         panel.add(
@@ -557,13 +589,8 @@ public class MainFrame extends JFrame {
         );
 
         panel.add(
-                textArea,
+                centerPanel,
                 BorderLayout.CENTER
-        );
-
-        panel.add(
-                icon,
-                BorderLayout.EAST
         );
 
         return panel;
@@ -575,11 +602,43 @@ public class MainFrame extends JFrame {
     ) {
         JPanel panel =
                 new JPanel(
-                        new BorderLayout()
-                );
+                        new BorderLayout(10, 10)
+                ) {
+                    @Override
+                    protected void paintComponent(
+                            Graphics g
+                    ) {
+                        super.paintComponent(
+                                g
+                        );
 
-        panel.setBackground(
-                Color.WHITE
+                        java.awt.Graphics2D g2 =
+                                (java.awt.Graphics2D) g.create();
+
+                        g2.setRenderingHint(
+                                java.awt.RenderingHints.KEY_ANTIALIASING,
+                                java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                        );
+
+                        g2.setColor(
+                                new Color(255, 255, 255, 175)
+                        );
+
+                        g2.fillRoundRect(
+                                0,
+                                0,
+                                getWidth(),
+                                getHeight(),
+                                22,
+                                22
+                        );
+
+                        g2.dispose();
+                    }
+                };
+
+        panel.setOpaque(
+                false
         );
 
         TitledBorder titledBorder =
@@ -624,8 +683,8 @@ public class MainFrame extends JFrame {
                 true
         );
 
-        textArea.setBackground(
-                Color.WHITE
+        textArea.setOpaque(
+                false
         );
 
         panel.add(
@@ -708,9 +767,7 @@ public class MainFrame extends JFrame {
                 + "\n"
                 + "수익률: "
                 + String.format("%+.2f", class4.returnRate())
-                + "%\n\n"
-                + "추천 이유:\n"
-                + class4.reason();
+                + "%\n";
     }
 
     private String createClass3Text(
@@ -749,9 +806,7 @@ public class MainFrame extends JFrame {
 
     private String createClass5Text(
             Class5 class5Result
-    )
-    {
-
+    ) {
         StringBuilder builder =
                 new StringBuilder();
 
@@ -766,7 +821,6 @@ public class MainFrame extends JFrame {
 
         return builder.toString();
     }
-
 
     private void replaceGridCard(
             int index,
@@ -803,9 +857,9 @@ public class MainFrame extends JFrame {
 
         replaceGridCard(
                 4,
-                createCard(
+                new CardPanel(
                         "5. 테마별 최근 7일 성과",
-                        createClass5Text(
+                        new Class5ScoreboardPanel(
                                 result.class5Result()
                         )
                 )
@@ -814,8 +868,6 @@ public class MainFrame extends JFrame {
         gridPanel.revalidate();
         gridPanel.repaint();
     }
-
-
 
     private void applyColorFields(
             String weatherName
@@ -1147,16 +1199,33 @@ public class MainFrame extends JFrame {
                     );
                 }
 
-                g.setColor(
-                        Color.BLACK
-                );
-
-                g.drawString(
+                String weatherLabel =
                         shortThemeName(
                                 themeName
-                        ),
-                        index * barAreaWidth + 6,
-                        height - 18
+                        );
+
+                g.setFont(
+                        new Font("맑은 고딕", Font.BOLD, 13)
+                );
+
+                g.setColor(
+                        new Color(245, 170, 210)   // 연핑크 파스텔톤
+                );
+
+                java.awt.FontMetrics fm =
+                        g.getFontMetrics();
+
+                int labelX =
+                        x + (barWidth - fm.stringWidth(weatherLabel)) / 2 + 2;
+// +10 이 오른쪽으로 미는 값
+
+                int labelY =
+                        height - 18;
+
+                g.drawString(
+                        weatherLabel,
+                        labelX,
+                        labelY
                 );
 
                 index++;
@@ -1188,23 +1257,23 @@ public class MainFrame extends JFrame {
                 String themeName
         ) {
             if (themeName.equals("편의점·간편식")) {
-                return "편의점";
+                return "비";
             }
 
             if (themeName.equals("여행·소비")) {
-                return "여행";
+                return "맑음";
             }
 
             if (themeName.equals("공기청정·위생")) {
-                return "공기";
+                return "미세먼지";
             }
 
             if (themeName.equals("냉방·여름소비")) {
-                return "냉방";
+                return "폭염";
             }
 
             if (themeName.equals("난방·겨울소비")) {
-                return "난방";
+                return "한파";
             }
 
             return themeName;

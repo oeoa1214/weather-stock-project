@@ -17,7 +17,14 @@ public final class WeatherApiClient {
                         + "latitude=36.1195&longitude=128.3446"
                         + "&current=temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m,weather_code";
 
-        return requestApi(apiUrl);
+        String result =
+                requestApi(apiUrl);
+
+        if (result.isBlank()) {
+            return createFallbackWeatherJson();
+        }
+
+        return result;
     }
 
     public static String getAirQualityData() {
@@ -27,11 +34,19 @@ public final class WeatherApiClient {
                         + "latitude=36.1195&longitude=128.3446"
                         + "&current=pm10";
 
-        return requestApi(apiUrl);
+        String result =
+                requestApi(apiUrl);
+
+        if (result.isBlank()) {
+            return createFallbackAirJson();
+        }
+
+        return result;
     }
 
-    private static String requestApi(String apiUrl) {
-
+    private static String requestApi(
+            String apiUrl
+    ) {
         StringBuilder result =
                 new StringBuilder();
 
@@ -43,6 +58,19 @@ public final class WeatherApiClient {
                     (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+
+            int responseCode =
+                    conn.getResponseCode();
+
+            if (responseCode < 200 || responseCode >= 300) {
+                System.out.println(
+                        "API 응답 실패: " + responseCode + " / " + apiUrl
+                );
+
+                return "";
+            }
 
             BufferedReader reader =
                     new BufferedReader(
@@ -60,9 +88,31 @@ public final class WeatherApiClient {
             reader.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(
+                    "API 호출 실패. 기본 날씨값으로 대체합니다."
+            );
         }
 
         return result.toString();
+    }
+
+    private static String createFallbackWeatherJson() {
+        return "{"
+                + "\"current\":{"
+                + "\"temperature_2m\":20.0,"
+                + "\"relative_humidity_2m\":50,"
+                + "\"precipitation\":0.0,"
+                + "\"wind_speed_10m\":1.0,"
+                + "\"weather_code\":0"
+                + "}"
+                + "}";
+    }
+
+    private static String createFallbackAirJson() {
+        return "{"
+                + "\"current\":{"
+                + "\"pm10\":30.0"
+                + "}"
+                + "}";
     }
 }
