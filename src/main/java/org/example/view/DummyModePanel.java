@@ -27,6 +27,12 @@ public class DummyModePanel extends JPanel {
         );
     }
 
+    public interface TemperatureStepListener {
+        void onStep(
+                AppController.KospiTemperatureStepResult result
+        );
+    }
+
     private static final String MODE_NONE =
             "NONE";
 
@@ -36,9 +42,13 @@ public class DummyModePanel extends JPanel {
     private static final String MODE_KOSPI =
             "KOSPI";
 
+    private static final String MODE_TEMPERATURE =
+            "TEMPERATURE";
+
     private final AppController appController;
     private final DummyStepListener dummyStepListener;
     private final KospiStepListener kospiStepListener;
+    private final TemperatureStepListener temperatureStepListener;
 
     private final Map<String, Integer> weatherCounts =
             new LinkedHashMap<>();
@@ -54,6 +64,9 @@ public class DummyModePanel extends JPanel {
 
     private final JButton kospiButton =
             new JButton("KOSPI 분석");
+
+    private final JButton temperatureButton =
+            new JButton("기온 분석");
 
     private final JButton regionButton =
             new JButton("지역: 대구");
@@ -78,7 +91,8 @@ public class DummyModePanel extends JPanel {
     public DummyModePanel(
             AppController appController,
             DummyStepListener dummyStepListener,
-            KospiStepListener kospiStepListener
+            KospiStepListener kospiStepListener,
+            TemperatureStepListener temperatureStepListener
     ) {
         this.appController =
                 appController;
@@ -88,6 +102,9 @@ public class DummyModePanel extends JPanel {
 
         this.kospiStepListener =
                 kospiStepListener;
+
+        this.temperatureStepListener =
+                temperatureStepListener;
 
         this.timer =
                 new Timer(
@@ -128,7 +145,7 @@ public class DummyModePanel extends JPanel {
 
         JPanel buttonPanel =
                 new JPanel(
-                        new GridLayout(2, 2, 4, 4)
+                        new GridLayout(3, 2, 4, 4)
                 );
 
         buttonPanel.add(
@@ -137,6 +154,10 @@ public class DummyModePanel extends JPanel {
 
         buttonPanel.add(
                 kospiButton
+        );
+
+        buttonPanel.add(
+                temperatureButton
         );
 
         buttonPanel.add(
@@ -168,6 +189,10 @@ public class DummyModePanel extends JPanel {
 
         kospiButton.addActionListener(
                 e -> toggleKospiMode()
+        );
+
+        temperatureButton.addActionListener(
+                e -> toggleTemperatureMode()
         );
 
         regionButton.addActionListener(
@@ -205,6 +230,19 @@ public class DummyModePanel extends JPanel {
         startKospiMode();
     }
 
+    private void toggleTemperatureMode() {
+        if (MODE_TEMPERATURE.equals(runningMode)) {
+            stopCurrentMode();
+            return;
+        }
+
+        if (!MODE_NONE.equals(runningMode)) {
+            stopCurrentMode();
+        }
+
+        startTemperatureMode();
+    }
+
     private void startDummyMode() {
         runningMode =
                 MODE_DUMMY;
@@ -227,6 +265,10 @@ public class DummyModePanel extends JPanel {
                 "KOSPI 분석"
         );
 
+        temperatureButton.setText(
+                "기온 분석"
+        );
+
         timer.start();
     }
 
@@ -241,7 +283,7 @@ public class DummyModePanel extends JPanel {
         );
 
         countArea.setText(
-                "KOSPI 평균수익률을\n날씨 테마별로 계산 중입니다."
+                "실제 KOSPI 수익률을\n날씨 테마별 평균으로 계산 중입니다."
         );
 
         dummyButton.setText(
@@ -250,6 +292,39 @@ public class DummyModePanel extends JPanel {
 
         kospiButton.setText(
                 "KOSPI 정지"
+        );
+
+        temperatureButton.setText(
+                "기온 분석"
+        );
+
+        timer.start();
+    }
+
+    private void startTemperatureMode() {
+        runningMode =
+                MODE_TEMPERATURE;
+
+        appController.startKospiTemperatureMode();
+
+        progressLabel.setText(
+                "기온: 0 / 0"
+        );
+
+        countArea.setText(
+                "실제 KOSPI 수익률을\n기온 구간별 평균으로 계산 중입니다."
+        );
+
+        dummyButton.setText(
+                "더미 시작"
+        );
+
+        kospiButton.setText(
+                "KOSPI 분석"
+        );
+
+        temperatureButton.setText(
+                "기온 정지"
         );
 
         timer.start();
@@ -266,6 +341,10 @@ public class DummyModePanel extends JPanel {
             appController.stopKospiAverageMode();
         }
 
+        if (MODE_TEMPERATURE.equals(runningMode)) {
+            appController.stopKospiTemperatureMode();
+        }
+
         runningMode =
                 MODE_NONE;
 
@@ -275,6 +354,10 @@ public class DummyModePanel extends JPanel {
 
         kospiButton.setText(
                 "KOSPI 분석"
+        );
+
+        temperatureButton.setText(
+                "기온 분석"
         );
     }
 
@@ -327,6 +410,11 @@ public class DummyModePanel extends JPanel {
 
         if (MODE_KOSPI.equals(runningMode)) {
             runKospiOneDay();
+            return;
+        }
+
+        if (MODE_TEMPERATURE.equals(runningMode)) {
+            runTemperatureOneDay();
         }
     }
 
@@ -393,6 +481,37 @@ public class DummyModePanel extends JPanel {
 
             progressLabel.setText(
                     "KOSPI: "
+                            + result.currentDay()
+                            + " / "
+                            + result.totalDay()
+            );
+        }
+    }
+
+    private void runTemperatureOneDay() {
+        AppController.KospiTemperatureStepResult result =
+                appController.runKospiTemperatureOneDay();
+
+        progressLabel.setText(
+                "기온: "
+                        + result.currentDay()
+                        + " / "
+                        + result.totalDay()
+        );
+
+        countArea.setText(
+                "실제 KOSPI 수익률을\n기온 구간별 평균으로 계산 중입니다."
+        );
+
+        temperatureStepListener.onStep(
+                result
+        );
+
+        if (result.finished()) {
+            stopCurrentMode();
+
+            progressLabel.setText(
+                    "기온: "
                             + result.currentDay()
                             + " / "
                             + result.totalDay()
