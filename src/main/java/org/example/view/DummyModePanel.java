@@ -21,8 +21,24 @@ public class DummyModePanel extends JPanel {
         );
     }
 
+    public interface KospiStepListener {
+        void onStep(
+                AppController.KospiAverageStepResult result
+        );
+    }
+
+    private static final String MODE_NONE =
+            "NONE";
+
+    private static final String MODE_DUMMY =
+            "DUMMY";
+
+    private static final String MODE_KOSPI =
+            "KOSPI";
+
     private final AppController appController;
     private final DummyStepListener dummyStepListener;
+    private final KospiStepListener kospiStepListener;
 
     private final Map<String, Integer> weatherCounts =
             new LinkedHashMap<>();
@@ -33,8 +49,11 @@ public class DummyModePanel extends JPanel {
     private final JTextArea countArea =
             new JTextArea();
 
-    private final JButton modeButton =
-            new JButton("시작");
+    private final JButton dummyButton =
+            new JButton("더미 시작");
+
+    private final JButton kospiButton =
+            new JButton("KOSPI 분석");
 
     private final JButton regionButton =
             new JButton("지역: 대구");
@@ -44,8 +63,8 @@ public class DummyModePanel extends JPanel {
 
     private final Timer timer;
 
-    private boolean running =
-            false;
+    private String runningMode =
+            MODE_NONE;
 
     private String regionName =
             "대구";
@@ -58,7 +77,8 @@ public class DummyModePanel extends JPanel {
 
     public DummyModePanel(
             AppController appController,
-            DummyStepListener dummyStepListener
+            DummyStepListener dummyStepListener,
+            KospiStepListener kospiStepListener
     ) {
         this.appController =
                 appController;
@@ -66,10 +86,13 @@ public class DummyModePanel extends JPanel {
         this.dummyStepListener =
                 dummyStepListener;
 
+        this.kospiStepListener =
+                kospiStepListener;
+
         this.timer =
                 new Timer(
                         500,
-                        e -> runOneDay()
+                        e -> runOneStep()
                 );
 
         setLayout(
@@ -105,11 +128,15 @@ public class DummyModePanel extends JPanel {
 
         JPanel buttonPanel =
                 new JPanel(
-                        new GridLayout(1, 3, 4, 4)
+                        new GridLayout(2, 2, 4, 4)
                 );
 
         buttonPanel.add(
-                modeButton
+                dummyButton
+        );
+
+        buttonPanel.add(
+                kospiButton
         );
 
         buttonPanel.add(
@@ -135,8 +162,12 @@ public class DummyModePanel extends JPanel {
                 BorderLayout.SOUTH
         );
 
-        modeButton.addActionListener(
+        dummyButton.addActionListener(
                 e -> toggleDummyMode()
+        );
+
+        kospiButton.addActionListener(
+                e -> toggleKospiMode()
         );
 
         regionButton.addActionListener(
@@ -149,17 +180,34 @@ public class DummyModePanel extends JPanel {
     }
 
     private void toggleDummyMode() {
-        if (running) {
-            stopDummyMode();
+        if (MODE_DUMMY.equals(runningMode)) {
+            stopCurrentMode();
             return;
+        }
+
+        if (!MODE_NONE.equals(runningMode)) {
+            stopCurrentMode();
         }
 
         startDummyMode();
     }
 
+    private void toggleKospiMode() {
+        if (MODE_KOSPI.equals(runningMode)) {
+            stopCurrentMode();
+            return;
+        }
+
+        if (!MODE_NONE.equals(runningMode)) {
+            stopCurrentMode();
+        }
+
+        startKospiMode();
+    }
+
     private void startDummyMode() {
-        running =
-                true;
+        runningMode =
+                MODE_DUMMY;
 
         resetWeatherCounts();
 
@@ -171,28 +219,67 @@ public class DummyModePanel extends JPanel {
                 "진행: 0 / 365"
         );
 
-        modeButton.setText(
-                "정지"
+        dummyButton.setText(
+                "더미 정지"
+        );
+
+        kospiButton.setText(
+                "KOSPI 분석"
         );
 
         timer.start();
     }
 
-    private void stopDummyMode() {
-        running =
-                false;
+    private void startKospiMode() {
+        runningMode =
+                MODE_KOSPI;
 
+        appController.startKospiAverageMode();
+
+        progressLabel.setText(
+                "KOSPI: 0 / 0"
+        );
+
+        countArea.setText(
+                "KOSPI 평균수익률을\n날씨 테마별로 계산 중입니다."
+        );
+
+        dummyButton.setText(
+                "더미 시작"
+        );
+
+        kospiButton.setText(
+                "KOSPI 정지"
+        );
+
+        timer.start();
+    }
+
+    private void stopCurrentMode() {
         timer.stop();
 
-        appController.stopDummyMode();
+        if (MODE_DUMMY.equals(runningMode)) {
+            appController.stopDummyMode();
+        }
 
-        modeButton.setText(
-                "시작"
+        if (MODE_KOSPI.equals(runningMode)) {
+            appController.stopKospiAverageMode();
+        }
+
+        runningMode =
+                MODE_NONE;
+
+        dummyButton.setText(
+                "더미 시작"
+        );
+
+        kospiButton.setText(
+                "KOSPI 분석"
         );
     }
 
     private void changeRegion() {
-        if (running) {
+        if (!MODE_NONE.equals(runningMode)) {
             return;
         }
 
@@ -216,6 +303,10 @@ public class DummyModePanel extends JPanel {
     }
 
     private void changeBonusLevel() {
+        if (!MODE_NONE.equals(runningMode)) {
+            return;
+        }
+
         bonusLevel++;
 
         if (bonusLevel > 3) {
@@ -228,7 +319,18 @@ public class DummyModePanel extends JPanel {
         );
     }
 
-    private void runOneDay() {
+    private void runOneStep() {
+        if (MODE_DUMMY.equals(runningMode)) {
+            runDummyOneDay();
+            return;
+        }
+
+        if (MODE_KOSPI.equals(runningMode)) {
+            runKospiOneDay();
+        }
+    }
+
+    private void runDummyOneDay() {
         AppController.DummyStepResult result =
                 appController.runDummyOneDay(
                         bonusLevel
@@ -256,15 +358,44 @@ public class DummyModePanel extends JPanel {
         );
 
         if (result.finished()) {
-            running =
-                    false;
+            stopCurrentMode();
 
-            timer.stop();
+            progressLabel.setText(
+                    "진행: "
+                            + result.currentDay()
+                            + " / "
+                            + result.totalDay()
+            );
+        }
+    }
 
-            appController.stopDummyMode();
+    private void runKospiOneDay() {
+        AppController.KospiAverageStepResult result =
+                appController.runKospiAverageOneDay();
 
-            modeButton.setText(
-                    "시작"
+        progressLabel.setText(
+                "KOSPI: "
+                        + result.currentDay()
+                        + " / "
+                        + result.totalDay()
+        );
+
+        countArea.setText(
+                "실제 KOSPI 수익률을\n날씨 테마별 평균으로 계산 중입니다."
+        );
+
+        kospiStepListener.onStep(
+                result
+        );
+
+        if (result.finished()) {
+            stopCurrentMode();
+
+            progressLabel.setText(
+                    "KOSPI: "
+                            + result.currentDay()
+                            + " / "
+                            + result.totalDay()
             );
         }
     }

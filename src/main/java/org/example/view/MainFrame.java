@@ -19,7 +19,6 @@ import javax.swing.border.TitledBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.util.List;
 import java.util.Map;
@@ -119,15 +118,15 @@ public class MainFrame extends JFrame {
         );
 
         gridPanel.add(
-                createThemeCard(
+                new ThemeRecommendPanel(
                         class4
                 )
         );
 
         gridPanel.add(
-                createCard(
+                new CardPanel(
                         "3. 추천 종목 Top 5",
-                        createClass3Text(
+                        new Class3RankingPanel(
                                 class3Result
                         )
                 )
@@ -157,15 +156,16 @@ public class MainFrame extends JFrame {
         );
 
         gridPanel.add(
-                new ViSimulationPanel()
+                new OPSimulationPanel()
         );
 
         gridPanel.add(
                 new CardPanel(
-                        "8. 1년 날씨 데이터 기반 수익률 예측",
+                        "8. 지역별 날씨·KOSPI 분석 모드",
                         new DummyModePanel(
                                 appController,
-                                this::applyDummyStepResult
+                                this::applyDummyStepResult,
+                                this::applyKospiAverageStepResult
                         )
                 )
         );
@@ -458,144 +458,6 @@ public class MainFrame extends JFrame {
         return label;
     }
 
-    private JPanel createThemeCard(
-            Class4 class4
-    ) {
-        JPanel panel =
-                new JPanel(
-                        new BorderLayout(10, 10)
-                ) {
-                    @Override
-                    protected void paintComponent(
-                            Graphics g
-                    ) {
-                        super.paintComponent(
-                                g
-                        );
-
-                        java.awt.Graphics2D g2 =
-                                (java.awt.Graphics2D) g.create();
-
-                        g2.setRenderingHint(
-                                java.awt.RenderingHints.KEY_ANTIALIASING,
-                                java.awt.RenderingHints.VALUE_ANTIALIAS_ON
-                        );
-
-                        g2.setColor(
-                                new Color(255, 255, 255, 175)
-                        );
-
-                        g2.fillRoundRect(
-                                0,
-                                0,
-                                getWidth(),
-                                getHeight(),
-                                22,
-                                22
-                        );
-
-                        g2.dispose();
-                    }
-                };
-
-        panel.setOpaque(
-                false
-        );
-
-        panel.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(
-                                new Color(205, 210, 215, 150),
-                                1
-                        ),
-                        BorderFactory.createEmptyBorder(
-                                10,
-                                12,
-                                10,
-                                12
-                        )
-                )
-        );
-
-        JLabel title =
-                new JLabel(
-                        "2. 현재 날씨 기반 대표 추천",
-                        SwingConstants.LEFT
-                );
-
-        title.setFont(
-                new Font("맑은 고딕", Font.BOLD, 13)
-        );
-
-        title.setForeground(
-                CARD_TITLE_COLOR
-        );
-
-        JTextArea textArea =
-                new JTextArea(
-                        createClass4Text(
-                                class4
-                        )
-                );
-
-        textArea.setFont(
-                new Font("맑은 고딕", Font.PLAIN, 14)
-        );
-
-        textArea.setForeground(
-                new Color(35, 35, 35)
-        );
-
-        textArea.setEditable(
-                false
-        );
-
-        textArea.setLineWrap(
-                true
-        );
-
-        textArea.setWrapStyleWord(
-                true
-        );
-
-        textArea.setOpaque(
-                false
-        );
-
-        JPanel centerPanel =
-                new JPanel(
-                        new BorderLayout(10, 0)
-                );
-
-        centerPanel.setOpaque(
-                false
-        );
-
-        centerPanel.add(
-                textArea,
-                BorderLayout.CENTER
-        );
-
-        centerPanel.add(
-                new ThemeCharacterPanel(
-                        class4.themeName()
-                ),
-                BorderLayout.EAST
-        );
-
-        panel.add(
-                title,
-                BorderLayout.NORTH
-        );
-
-        panel.add(
-                centerPanel,
-                BorderLayout.CENTER
-        );
-
-        return panel;
-    }
-
     private JScrollPane createCard(
             String title,
             String content
@@ -606,7 +468,7 @@ public class MainFrame extends JFrame {
                 ) {
                     @Override
                     protected void paintComponent(
-                            Graphics g
+                            java.awt.Graphics g
                     ) {
                         super.paintComponent(
                                 g
@@ -714,20 +576,20 @@ public class MainFrame extends JFrame {
                 );
 
         panel.setBackground(
-                Color.WHITE
+                new Color(255, 252, 255)
         );
 
         TitledBorder titledBorder =
                 BorderFactory.createTitledBorder(
                         BorderFactory.createLineBorder(
-                                CARD_BORDER_COLOR,
+                                new Color(220, 205, 220),
                                 1
                         ),
                         title,
                         TitledBorder.LEFT,
                         TitledBorder.TOP,
                         new Font("맑은 고딕", Font.BOLD, 13),
-                        CARD_TITLE_COLOR
+                        new Color(80, 70, 90)
                 );
 
         panel.setBorder(
@@ -753,74 +615,7 @@ public class MainFrame extends JFrame {
         return scrollPane;
     }
 
-    private String createClass4Text(
-            Class4 class4
-    ) {
-        return "추천 테마: "
-                + class4.themeName()
-                + "\n"
-                + "대표 추천 종목: "
-                + class4.stockName()
-                + "\n"
-                + "현재가: "
-                + String.format("%,.0f원", class4.currentPrice())
-                + "\n"
-                + "수익률: "
-                + String.format("%+.2f", class4.returnRate())
-                + "%\n";
-    }
 
-    private String createClass3Text(
-            List<Class3> class3Result
-    ) {
-        StringBuilder builder =
-                new StringBuilder();
-
-        for (int i = 0; i < class3Result.size(); i++) {
-            Class3 stock =
-                    class3Result.get(i);
-
-            builder.append(i + 1)
-                    .append(". ")
-                    .append(stock.name())
-                    .append("\n")
-                    .append("   심볼: ")
-                    .append(stock.symbol())
-                    .append("\n")
-                    .append("   테마: ")
-                    .append(stock.theme())
-                    .append("\n")
-                    .append("   현재가: ")
-                    .append(String.format("%,.0f원", stock.currentPrice()))
-                    .append("\n")
-                    .append("   수익률: ")
-                    .append(String.format("%+.2f", stock.returnRate()))
-                    .append("%\n")
-                    .append("   이유: ")
-                    .append(stock.reason())
-                    .append("\n\n");
-        }
-
-        return builder.toString();
-    }
-
-    private String createClass5Text(
-            Class5 class5Result
-    ) {
-        StringBuilder builder =
-                new StringBuilder();
-
-        for (Map.Entry<String, Double> entry
-                : class5Result.getSevenDayReturnRates().entrySet()) {
-
-            builder.append(entry.getKey())
-                    .append(" : ")
-                    .append(String.format("%+.2f", entry.getValue()))
-                    .append("%\n");
-        }
-
-        return builder.toString();
-    }
 
     private void replaceGridCard(
             int index,
@@ -862,6 +657,25 @@ public class MainFrame extends JFrame {
                         new Class5ScoreboardPanel(
                                 result.class5Result()
                         )
+                )
+        );
+
+        gridPanel.revalidate();
+        gridPanel.repaint();
+    }
+
+    private void applyKospiAverageStepResult(
+            AppController.KospiAverageStepResult result
+    ) {
+        if (result == null) {
+            return;
+        }
+
+        replaceGridCard(
+                5,
+                createClass6Card(
+                        "6. 연간 코스피 적중테마 평균 수익률",
+                        result.class6Result()
                 )
         );
 
@@ -1037,247 +851,6 @@ public class MainFrame extends JFrame {
         }
 
         return "★";
-    }
-
-    private class Class6GraphPanel extends JPanel {
-
-        private final Class6 class6Result;
-
-        private Class6GraphPanel(
-                Class6 class6Result
-        ) {
-            this.class6Result =
-                    class6Result;
-
-            setBackground(
-                    Color.WHITE
-            );
-        }
-
-        @Override
-        protected void paintComponent(
-                Graphics g
-        ) {
-            super.paintComponent(
-                    g
-            );
-
-            if (class6Result == null
-                    || class6Result.getCumulativeReturnRates().isEmpty()) {
-                g.setColor(
-                        Color.BLACK
-                );
-
-                g.drawString(
-                        "누적수익률 데이터가 없습니다.",
-                        20,
-                        30
-                );
-
-                return;
-            }
-
-            Map<String, Double> rates =
-                    class6Result.getCumulativeReturnRates();
-
-            int width =
-                    getWidth();
-
-            int height =
-                    getHeight();
-
-            int top =
-                    30;
-
-            int bottom =
-                    height - 45;
-
-            int zeroY =
-                    (top + bottom) / 2;
-
-            int graphHeight =
-                    (bottom - top) / 2;
-
-            int count =
-                    rates.size();
-
-            int barAreaWidth =
-                    width / count;
-
-            int barWidth =
-                    34;
-
-            double maxAbs =
-                    findMaxAbs(
-                            rates
-                    );
-
-            if (maxAbs < 1.0) {
-                maxAbs =
-                        1.0;
-            }
-
-            g.setColor(
-                    Color.GRAY
-            );
-
-            g.drawLine(
-                    10,
-                    zeroY,
-                    width - 10,
-                    zeroY
-            );
-
-            g.setFont(
-                    new Font("맑은 고딕", Font.BOLD, 11)
-            );
-
-            int index =
-                    0;
-
-            for (Map.Entry<String, Double> entry : rates.entrySet()) {
-                String themeName =
-                        entry.getKey();
-
-                double rate =
-                        entry.getValue();
-
-                int barHeight =
-                        (int) (Math.abs(rate) / maxAbs * graphHeight);
-
-                int x =
-                        index * barAreaWidth
-                                + (barAreaWidth - barWidth) / 2;
-
-                if (rate >= 0) {
-                    int y =
-                            zeroY - barHeight;
-
-                    g.setColor(
-                            new Color(210, 60, 60)
-                    );
-
-                    g.fillRect(
-                            x,
-                            y,
-                            barWidth,
-                            barHeight
-                    );
-
-                    g.setColor(
-                            Color.BLACK
-                    );
-
-                    g.drawString(
-                            String.format("%+.1f%%", rate),
-                            x - 8,
-                            y - 5
-                    );
-                } else {
-                    int y =
-                            zeroY;
-
-                    g.setColor(
-                            new Color(60, 100, 210)
-                    );
-
-                    g.fillRect(
-                            x,
-                            y,
-                            barWidth,
-                            barHeight
-                    );
-
-                    g.setColor(
-                            Color.BLACK
-                    );
-
-                    g.drawString(
-                            String.format("%+.1f%%", rate),
-                            x - 8,
-                            y + barHeight + 15
-                    );
-                }
-
-                String weatherLabel =
-                        shortThemeName(
-                                themeName
-                        );
-
-                g.setFont(
-                        new Font("맑은 고딕", Font.BOLD, 13)
-                );
-
-                g.setColor(
-                        new Color(245, 170, 210)   // 연핑크 파스텔톤
-                );
-
-                java.awt.FontMetrics fm =
-                        g.getFontMetrics();
-
-                int labelX =
-                        x + (barWidth - fm.stringWidth(weatherLabel)) / 2 + 2;
-// +10 이 오른쪽으로 미는 값
-
-                int labelY =
-                        height - 18;
-
-                g.drawString(
-                        weatherLabel,
-                        labelX,
-                        labelY
-                );
-
-                index++;
-            }
-        }
-
-        private double findMaxAbs(
-                Map<String, Double> rates
-        ) {
-            double max =
-                    0.0;
-
-            for (double rate : rates.values()) {
-                double abs =
-                        Math.abs(
-                                rate
-                        );
-
-                if (abs > max) {
-                    max =
-                            abs;
-                }
-            }
-
-            return max;
-        }
-
-        private String shortThemeName(
-                String themeName
-        ) {
-            if (themeName.equals("편의점·간편식")) {
-                return "비";
-            }
-
-            if (themeName.equals("여행·소비")) {
-                return "맑음";
-            }
-
-            if (themeName.equals("공기청정·위생")) {
-                return "미세먼지";
-            }
-
-            if (themeName.equals("냉방·여름소비")) {
-                return "폭염";
-            }
-
-            if (themeName.equals("난방·겨울소비")) {
-                return "한파";
-            }
-
-            return themeName;
-        }
     }
 
     private record WeatherColor(

@@ -1,8 +1,8 @@
 package org.example.view;
 
-import org.example.vi.ViChangeSaver;
-import org.example.vi.ViStock;
-import org.example.vi.ViStockFileReader;
+import org.example.OP.OPChangeSaver;
+import org.example.OP.OPStock;
+import org.example.OP.OPStockFileReader;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -10,32 +10,31 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViSimulationPanel extends JPanel {
+public class OPSimulationPanel extends JPanel {
 
     private static final int TICK_MS = 500;
     private static final int HIDDEN_WAIT_MS = 60000; // 다시 60초(60000ms)로 원복
 
-    private final ViStockFileReader stockFileReader = new ViStockFileReader();
-    private final ViChangeSaver viChangeSaver = new ViChangeSaver();
-    private final ViTextMaker textMaker = new ViTextMaker();
+    private final OPStockFileReader stockFileReader = new OPStockFileReader();
+    private final OPChangeSaver OPChangeSaver = new OPChangeSaver();
 
     private final List<ViewStock> viewStocks = new ArrayList<>();
-    private final List<ViStockRowPanel> rowPanels = new ArrayList<>();
+    private final List<OPStockRowPanel> rowPanels = new ArrayList<>();
 
     private final JLabel statusLabel = new JLabel();
     private final JButton pickButton = new JButton("종목 새로뽑기");
-    private final JButton viButton = new JButton("VI 시작");
+    private final JButton opButton = new JButton("시초가 예측 시작");
 
     private Thread producerThread;
     private Thread consumerThread;
     private volatile boolean running;
 
-    public ViSimulationPanel() {
+    public OPSimulationPanel() {
         setLayout(new BorderLayout(8, 8));
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                "7. VI 더미 주가 변동",
+                "7. 시작가 예측 프로그램",
                 TitledBorder.LEFT,
                 TitledBorder.TOP,
                 new Font("맑은 고딕", Font.BOLD, 13),
@@ -53,7 +52,7 @@ public class ViSimulationPanel extends JPanel {
     private void setupStatusLabel() {
         statusLabel.setFont(new Font("맑은 고딕", Font.BOLD, 13));
         statusLabel.setHorizontalAlignment(JLabel.CENTER);
-        statusLabel.setText(textMaker.makeReadyText());
+        statusLabel.setText(makeReadyText());
     }
 
     private JPanel createRowsPanel() {
@@ -61,7 +60,7 @@ public class ViSimulationPanel extends JPanel {
         rowsPanel.setBackground(Color.WHITE);
 
         for (int i = 0; i < 5; i++) {
-            ViStockRowPanel rowPanel = new ViStockRowPanel();
+            OPStockRowPanel rowPanel = new OPStockRowPanel();
             rowPanels.add(rowPanel);
             rowsPanel.add(rowPanel);
         }
@@ -73,13 +72,13 @@ public class ViSimulationPanel extends JPanel {
         buttonPanel.setBackground(Color.WHITE);
 
         setupButton(pickButton);
-        setupButton(viButton);
+        setupButton(opButton);
 
         pickButton.addActionListener(event -> pickRandomStocks());
-        viButton.addActionListener(event -> toggleVi());
+        opButton.addActionListener(event -> toggleOp());
 
         buttonPanel.add(pickButton);
-        buttonPanel.add(viButton);
+        buttonPanel.add(opButton);
 
         return buttonPanel;
     }
@@ -90,35 +89,35 @@ public class ViSimulationPanel extends JPanel {
     }
 
     private void pickRandomStocks() {
-        stopVi();
+        stopOp();
 
-        List<ViStock> pickedStocks = stockFileReader.pickRandomFiveStocks();
+        List<OPStock> pickedStocks = stockFileReader.pickRandomFiveStocks();
         viewStocks.clear();
 
-        for (ViStock stock : pickedStocks) {
+        for (OPStock stock : pickedStocks) {
             viewStocks.add(new ViewStock(stock.stockName(), stock.currentPrice()));
         }
 
         refreshRows();
-        statusLabel.setText(textMaker.makeReadyText());
+        statusLabel.setText(makeReadyText());
     }
 
-    private void toggleVi() {
+    private void toggleOp() {
         if (running) {
-            stopVi();
+            stopOp();
         } else {
-            startVi();
+            startOp();
         }
     }
 
-    private void startVi() {
+    private void startOp() {
         if (viewStocks.size() != 5) return;
 
         running = true;
-        viChangeSaver.reset();
+        OPChangeSaver.reset();
 
-        viButton.setText("VI 정지");
-        statusLabel.setText(textMaker.makeWaitingText(60));
+        opButton.setText("시초가 예측 정지");
+        statusLabel.setText(makeWaitingText(60));
 
         // [생산자 스레드] 60초 동안 카운트다운 갱신 & 뒤에서 값 누적
         producerThread = new Thread(() -> {
@@ -132,16 +131,16 @@ public class ViSimulationPanel extends JPanel {
                     // 남은 시간 계산해서 화면 갱신
                     int remainSeconds = 60 - (int) (elapsed / 1000);
                     SwingUtilities.invokeLater(() -> {
-                        statusLabel.setText(textMaker.makeWaitingText(remainSeconds));
+                        statusLabel.setText(makeWaitingText(remainSeconds));
                     });
 
                     Thread.sleep(TICK_MS); // 0.5초 대기
-                    viChangeSaver.addChanges(getCurrentPrices()); // 0.5초마다 누적
+                    OPChangeSaver.addChanges(getCurrentPrices()); // 0.5초마다 누적
                 }
 
                 // 60초가 꽉 차면 빗장을 품 (내부적으로 notifyAll 실행)
                 if (running) {
-                    viChangeSaver.open();
+                    OPChangeSaver.open();
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -152,21 +151,21 @@ public class ViSimulationPanel extends JPanel {
         consumerThread = new Thread(() -> {
             try {
                 // 생산자가 open() 할 때까지 대기
-                double[] oneMinuteChanges = viChangeSaver.waitAndTakeChanges();
+                double[] oneMinuteChanges = OPChangeSaver.waitAndTakeChanges();
 
                 if (!running) return;
 
                 // 잠에서 깨어나면 누적된 값 한 번에 화면에 적용
                 SwingUtilities.invokeLater(() -> {
                     applyChangesToViewStocks(oneMinuteChanges);
-                    statusLabel.setText(textMaker.makeOpenedText());
+                    statusLabel.setText(makeOpenedText());
                     refreshRows();
                 });
 
                 // 이후 0.5초마다 실시간 갱신 무한 반복
                 while (running && !Thread.currentThread().isInterrupted()) {
                     Thread.sleep(TICK_MS);
-                    double[] liveChanges = viChangeSaver.makeChanges(getCurrentPrices());
+                    double[] liveChanges = OPChangeSaver.makeChanges(getCurrentPrices());
 
                     SwingUtilities.invokeLater(() -> {
                         applyChangesToViewStocks(liveChanges);
@@ -182,17 +181,17 @@ public class ViSimulationPanel extends JPanel {
         consumerThread.start();
     }
 
-    private void stopVi() {
+    private void stopOp() {
         running = false;
 
-        viChangeSaver.stop(); // 락 풀고 종료 신호 보냄
+        OPChangeSaver.stop(); // 락 풀고 종료 신호 보냄
 
         if (producerThread != null) producerThread.interrupt();
         if (consumerThread != null) consumerThread.interrupt();
 
-        viButton.setText("VI 시작");
+        opButton.setText("시초가 예측 시작");
         if (!viewStocks.isEmpty()) {
-            statusLabel.setText(textMaker.makeStoppedText());
+            statusLabel.setText(makeStoppedText());
         }
     }
 
@@ -215,6 +214,30 @@ public class ViSimulationPanel extends JPanel {
             ViewStock stock = viewStocks.get(i);
             rowPanels.get(i).updateRow(i + 1, stock.stockName, stock.currentPrice, stock.getChangeRate());
         }
+    }
+
+    private String makeReadyText() {
+        return "장전 호가 대기중";
+    }
+
+    private String makeWaitingText(
+            int remainSeconds
+    ) {
+        int second =
+                60 - remainSeconds;
+
+        return String.format(
+                "장전 호가 수집중 · 08:59:%02d",
+                second
+        );
+    }
+
+    private String makeOpenedText() {
+        return "예상 시초가 공개중";
+    }
+
+    private String makeStoppedText() {
+        return "시초가 예측 정지";
     }
 
     private static class ViewStock {

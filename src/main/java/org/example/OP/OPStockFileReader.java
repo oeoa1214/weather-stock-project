@@ -1,4 +1,4 @@
-package org.example.vi;
+package org.example.OP;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ViStockFileReader {
+public class OPStockFileReader {
 
     private static final String FILE_PATH =
             "data/vi_stocks.csv";
@@ -15,8 +15,8 @@ public class ViStockFileReader {
     private static final int PICK_COUNT =
             5;
 
-    public List<ViStock> loadAllStocks() {
-        List<ViStock> stocks =
+    public List<OPStock> loadAllStocks() {
+        List<OPStock> stocks =
                 new ArrayList<>();
 
         try (
@@ -63,7 +63,7 @@ public class ViStockFileReader {
                         );
 
                 stocks.add(
-                        new ViStock(
+                        new OPStock(
                                 stockName,
                                 currentPrice,
                                 changeRate
@@ -80,8 +80,8 @@ public class ViStockFileReader {
         return stocks;
     }
 
-    public List<ViStock> pickRandomFiveStocks() {
-        List<ViStock> allStocks =
+    public List<OPStock> pickRandomFiveStocks() {
+        List<OPStock> allStocks =
                 loadAllStocks();
 
         if (allStocks.size() < PICK_COUNT) {
@@ -90,7 +90,7 @@ public class ViStockFileReader {
             );
         }
 
-        List<ViStock> copiedStocks =
+        List<OPStock> copiedStocks =
                 new ArrayList<>(
                         allStocks
                 );

@@ -6,18 +6,18 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 
-public class ViStockRowPanel extends JPanel {
+public class OPStockRowPanel extends JPanel {
 
     private final JLabel label =
             new JLabel();
 
-    private final ViTextMaker textMaker =
-            new ViTextMaker();
+    private final OPTextMaker textMaker =
+            new OPTextMaker();
 
-    private final ViColorDecider colorDecider =
-            new ViColorDecider();
+    private final OPColorDecider colorDecider =
+            new OPColorDecider();
 
-    public ViStockRowPanel() {
+    public OPStockRowPanel() {
         setLayout(
                 new GridLayout(1, 1)
         );

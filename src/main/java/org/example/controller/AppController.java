@@ -21,15 +21,17 @@ public class AppController {
     private final DummyModeController dummyModeController =
             new DummyModeController();
 
-
-
-
-
-
-
-
-
-
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 1]
+     * KospiWeatherAverageController는
+     * KOSPI-날씨 CSV → Judge2 → Converter → 테마별 KOSPI 평균수익률 계산까지만 담당한다.
+     *
+     * 여기서는 Class5를 쓰지 않고, Class6 그래프만 재사용한다.
+     * =========================================================
+     */
+    private final KospiWeatherAverageController kospiWeatherAverageController =
+            new KospiWeatherAverageController();
 
     /*
      * =========================================================
@@ -51,6 +53,15 @@ public class AppController {
      * =========================================================
      */
     private boolean dummyMode =
+            false;
+
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 2]
+     * View 버튼이 KOSPI 평균 모드 시작/정지를 제어할 때 쓰는 상태값
+     * =========================================================
+     */
+    private boolean kospiAverageMode =
             false;
 
     public void run() {
@@ -251,7 +262,7 @@ public class AppController {
         System.out.println("===== Class9 음식 추천 =====");
         System.out.println(class9);
 
-         new MainFrame(
+        new MainFrame(
                 class1,
                 class4,
                 class3Result,
@@ -294,6 +305,7 @@ public class AppController {
 
         run6Service.resetDummy();
     }
+
     /*
      * =========================================================
      * [더미모드 연결 5]
@@ -423,6 +435,135 @@ public class AppController {
             String weatherName,
             String themeName,
             Class5 class5Result,
+            Class6 class6Result
+    ) {
+    }
+
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 3]
+     * KOSPI 평균 모드 시작 메서드
+     *
+     * 역할:
+     * - KOSPI 평균 모드 ON
+     * - data/kospi_weather_2025.csv 처음부터 시작
+     * - run6 더미 상태 초기화
+     *
+     * 이 모드는 Class5를 사용하지 않고 Class6 그래프만 갱신한다.
+     * =========================================================
+     */
+    public void startKospiAverageMode() {
+        kospiAverageMode =
+                true;
+
+        kospiWeatherAverageController.start(
+                "data/kospi_weather_2025.csv"
+        );
+
+        run6Service.resetDummy();
+    }
+
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 4]
+     * View의 Timer가 0.5초마다 호출할 메서드
+     *
+     * 흐름:
+     * KospiWeatherAverageController
+     * → 하루치 KOSPI 수익률을 해당 날씨 테마에 반영
+     * → 테마별 평균 KOSPI 수익률 Map 반환
+     * → AppController가 run6에 전달
+     * → Class6 결과 반환
+     *
+     * 주의:
+     * run6는 원래 누적용이므로, 여기서는 매번 reset 후 평균 Map을 한 번만 넣어
+     * Class6 그래프를 "평균수익률 표시용"으로 재사용한다.
+     * =========================================================
+     */
+    public KospiAverageStepResult runKospiAverageOneDay() {
+        if (!kospiAverageMode) {
+            throw new IllegalStateException(
+                    "KOSPI 평균 모드가 시작되지 않았습니다."
+            );
+        }
+
+        if (kospiWeatherAverageController.isFinished()) {
+            kospiAverageMode =
+                    false;
+
+            return new KospiAverageStepResult(
+                    true,
+                    kospiWeatherAverageController.getCurrentDay(),
+                    kospiWeatherAverageController.getTotalDay(),
+                    run6Service.getClass6()
+            );
+        }
+
+        Map<String, Double> averageReturnMap =
+                kospiWeatherAverageController.nextDay();
+
+        /*
+         * run6Service는 누적 구조이므로,
+         * KOSPI 평균 모드에서는 매 tick마다 reset 후 평균값 Map을 한 번만 넣는다.
+         */
+        run6Service.resetDummy();
+
+        Class6 class6Result =
+                run6Service.createClass6ByDummy(
+                        averageReturnMap
+                );
+
+        boolean finished =
+                kospiWeatherAverageController.isFinished();
+
+        if (finished) {
+            kospiAverageMode =
+                    false;
+        }
+
+        return new KospiAverageStepResult(
+                finished,
+                kospiWeatherAverageController.getCurrentDay(),
+                kospiWeatherAverageController.getTotalDay(),
+                class6Result
+        );
+    }
+
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 5]
+     * View의 정지 버튼 또는 완료 시 호출할 수 있는 메서드
+     * =========================================================
+     */
+    public void stopKospiAverageMode() {
+        kospiAverageMode =
+                false;
+    }
+
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 6]
+     * View가 현재 KOSPI 평균 모드 실행 중인지 확인할 때 사용
+     * =========================================================
+     */
+    public boolean isKospiAverageMode() {
+        return kospiAverageMode;
+    }
+
+    /*
+     * =========================================================
+     * [KOSPI 평균 모드 연결 7]
+     * View가 Timer 한 번 실행 후 받을 결과 묶음
+     *
+     * View는 여기서:
+     * - currentDay / totalDay로 날짜 카운터 표시
+     * - class6Result로 6번 그래프 갱신
+     * =========================================================
+     */
+    public record KospiAverageStepResult(
+            boolean finished,
+            int currentDay,
+            int totalDay,
             Class6 class6Result
     ) {
     }

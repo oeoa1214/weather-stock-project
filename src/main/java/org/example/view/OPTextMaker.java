@@ -1,6 +1,6 @@
 package org.example.view;
 
-public class ViTextMaker {
+public class OPTextMaker {
 
     public String makeStockText(
             int number,

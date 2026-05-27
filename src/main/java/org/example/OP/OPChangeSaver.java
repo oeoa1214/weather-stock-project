@@ -1,4 +1,4 @@
-package org.example.vi;
+package org.example.OP;
 //1. addChanges()
 //   → 0.5초마다 oneMinuteArray에 값 누적
 //   → synchronized라서 누적 중 다른 synchronized 메서드 못 들어옴
@@ -25,7 +25,7 @@ package org.example.vi;
 import java.util.Arrays;
 import java.util.Random;
 
-public class ViChangeSaver {
+public class OPChangeSaver {
 
     private static final int STOCK_COUNT = 5;
 

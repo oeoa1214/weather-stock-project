@@ -132,23 +132,23 @@ public class ThemeCharacterPanel extends JPanel {
             String themeName
     ) {
         if (themeName.contains("편의점")) {
-            return "<html><center>선생님, 비 오는 날엔<br>편의점·간편식 테마가 좋아요!</center></html>";
+            return "<html><center>선생님! 오늘의 추천종목이에요!</center></html>";
         }
 
         if (themeName.contains("여행")) {
-            return "<html><center>선생님, 날씨가 좋아요!<br>여행·소비 테마가 유리해요.</center></html>";
+            return "<html><center>선생님! 오늘의 추천종목이에요!</center></html>";
         }
 
         if (themeName.contains("공기")) {
-            return "<html><center>선생님, 공기질이 좋지 않아요.<br>공기청정·위생 테마를 봐요.</center></html>";
+            return "<html><center>선생님! 오늘의 추천종목이에요!</center></html>";
         }
 
         if (themeName.contains("냉방")) {
-            return "<html><center>선생님, 더운 날씨예요!<br>냉방·여름소비 테마가 좋아요.</center></html>";
+            return "<html><center>선생님! 오늘의 추천종목이에요!</center></html>";
         }
 
         if (themeName.contains("난방")) {
-            return "<html><center>선생님, 추운 날씨예요!<br>난방·겨울소비 테마를 봐요.</center></html>";
+            return "<html><center>선생님! 오늘의 추천종목이에요!</center></html>";
         }
 
         return "<html><center>선생님, 오늘 조건에 맞는<br>추천 테마를 확인해보세요.</center></html>";

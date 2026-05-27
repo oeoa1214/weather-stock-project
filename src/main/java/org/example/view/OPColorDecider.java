@@ -2,7 +2,7 @@ package org.example.view;
 
 import java.awt.Color;
 
-public class ViColorDecider {
+public class OPColorDecider {
 
     // 실제 증권사 앱에서 많이 쓰는 가독성 높고 세련된 색상
     private static final Color STOCK_RED = new Color(223, 62, 79);   // 차분하면서도 선명한 딥 레드

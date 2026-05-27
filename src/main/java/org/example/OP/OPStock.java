@@ -1,11 +1,11 @@
-package org.example.vi;
+package org.example.OP;
 
-public record ViStock(
+public record OPStock(
         String stockName,
         double currentPrice,
         double changeRate
 ) {
-    public ViStock {
+    public OPStock {
         if (stockName == null || stockName.isBlank()) {
             throw new IllegalArgumentException(
                     "종목 이름은 비어 있을 수 없습니다."
