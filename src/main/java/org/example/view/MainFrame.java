@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import java.awt.BorderLayout;
@@ -21,7 +20,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.List;
-import java.util.Map;
 
 public class MainFrame extends JFrame {
 
@@ -35,12 +33,6 @@ public class MainFrame extends JFrame {
 
     private Color backgroundColor;
     private Color textColor;
-
-    private static final Color CARD_BORDER_COLOR =
-            new Color(205, 210, 215);
-
-    private static final Color CARD_TITLE_COLOR =
-            new Color(90, 95, 105);
 
     public MainFrame(
             Class1 class1,
@@ -458,114 +450,6 @@ public class MainFrame extends JFrame {
         return label;
     }
 
-    private JScrollPane createCard(
-            String title,
-            String content
-    ) {
-        JPanel panel =
-                new JPanel(
-                        new BorderLayout(10, 10)
-                ) {
-                    @Override
-                    protected void paintComponent(
-                            java.awt.Graphics g
-                    ) {
-                        super.paintComponent(
-                                g
-                        );
-
-                        java.awt.Graphics2D g2 =
-                                (java.awt.Graphics2D) g.create();
-
-                        g2.setRenderingHint(
-                                java.awt.RenderingHints.KEY_ANTIALIASING,
-                                java.awt.RenderingHints.VALUE_ANTIALIAS_ON
-                        );
-
-                        g2.setColor(
-                                new Color(255, 255, 255, 175)
-                        );
-
-                        g2.fillRoundRect(
-                                0,
-                                0,
-                                getWidth(),
-                                getHeight(),
-                                22,
-                                22
-                        );
-
-                        g2.dispose();
-                    }
-                };
-
-        panel.setOpaque(
-                false
-        );
-
-        TitledBorder titledBorder =
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(
-                                CARD_BORDER_COLOR,
-                                1
-                        ),
-                        title,
-                        TitledBorder.LEFT,
-                        TitledBorder.TOP,
-                        new Font("맑은 고딕", Font.BOLD, 13),
-                        CARD_TITLE_COLOR
-                );
-
-        panel.setBorder(
-                titledBorder
-        );
-
-        JTextArea textArea =
-                new JTextArea(
-                        content
-                );
-
-        textArea.setFont(
-                new Font("맑은 고딕", Font.PLAIN, 14)
-        );
-
-        textArea.setForeground(
-                new Color(35, 35, 35)
-        );
-
-        textArea.setEditable(
-                false
-        );
-
-        textArea.setLineWrap(
-                true
-        );
-
-        textArea.setWrapStyleWord(
-                true
-        );
-
-        textArea.setOpaque(
-                false
-        );
-
-        panel.add(
-                textArea,
-                BorderLayout.CENTER
-        );
-
-        JScrollPane scrollPane =
-                new JScrollPane(
-                        panel
-                );
-
-        scrollPane.setBorder(
-                null
-        );
-
-        return scrollPane;
-    }
-
     private JScrollPane createClass6Card(
             String title,
             Class6 class6Result
@@ -614,8 +498,6 @@ public class MainFrame extends JFrame {
 
         return scrollPane;
     }
-
-
 
     private void replaceGridCard(
             int index,
@@ -799,58 +681,6 @@ public class MainFrame extends JFrame {
                 new Color(228, 250, 244),
                 new Color(35, 95, 85)
         );
-    }
-
-    private Color getThemeDarkColor(
-            String themeName
-    ) {
-        if (themeName.contains("편의점")) {
-            return new Color(20, 95, 170);
-        }
-
-        if (themeName.contains("여행")) {
-            return new Color(25, 135, 105);
-        }
-
-        if (themeName.contains("냉방")) {
-            return new Color(20, 115, 190);
-        }
-
-        if (themeName.contains("난방")) {
-            return new Color(190, 85, 35);
-        }
-
-        if (themeName.contains("공기")) {
-            return new Color(120, 85, 150);
-        }
-
-        return new Color(40, 70, 110);
-    }
-
-    private String getThemeIcon(
-            String themeName
-    ) {
-        if (themeName.contains("편의점")) {
-            return "🛒";
-        }
-
-        if (themeName.contains("여행")) {
-            return "🛍";
-        }
-
-        if (themeName.contains("냉방")) {
-            return "❄";
-        }
-
-        if (themeName.contains("난방")) {
-            return "🔥";
-        }
-
-        if (themeName.contains("공기")) {
-            return "🌫";
-        }
-
-        return "★";
     }
 
     private record WeatherColor(
