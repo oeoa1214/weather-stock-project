@@ -576,7 +576,7 @@ public class MainFrame extends JFrame {
         replaceGridCard(
                 5,
                 createClass6Card(
-                        "6. 기온 구간별 KOSPI 평균 수익률",
+                        "6. 기온 구간별 KOSPI 일일 평균 수익률",
                         result.class6Result()
                 )
         );

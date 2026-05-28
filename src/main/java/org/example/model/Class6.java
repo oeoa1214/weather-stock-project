@@ -38,6 +38,53 @@ public class Class6 {
         );
     }
 
+    /*
+     * 평균 분석용 경로
+     *
+     * 기온 구간 분석처럼 key가 기존 테마명이 아닐 때 사용한다.
+     * 예:
+     * 5도↓, 5~15도, 15~22도, 22~28도, 28도↑
+     *
+     * 기존 setRate()는 테마명 검증을 하므로,
+
+     */
+    public void setAverageRates(
+            Map<String, Double> averageRates
+    ) {
+        if (averageRates == null || averageRates.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "averageRates는 비어 있을 수 없습니다."
+            );
+        }
+
+        cumulativeReturnRates.clear();
+
+        for (Map.Entry<String, Double> entry : averageRates.entrySet()) {
+            String name =
+                    entry.getKey();
+
+            Double rate =
+                    entry.getValue();
+
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException(
+                        "평균 수익률 이름은 비어 있을 수 없습니다."
+                );
+            }
+
+            if (rate == null) {
+                throw new IllegalArgumentException(
+                        "평균 수익률 값은 null일 수 없습니다: " + name
+                );
+            }
+
+            cumulativeReturnRates.put(
+                    name,
+                    rate
+            );
+        }
+    }
+
     public Map<String, Double> getCumulativeReturnRates() {
         return cumulativeReturnRates;
     }

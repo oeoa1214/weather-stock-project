@@ -659,7 +659,7 @@ public class AppController {
         run6Service.resetDummy();
 
         Class6 class6Result =
-                run6Service.createClass6ByDummy(
+                run6Service.createClass6ByAverageMap(
                         averageReturnMap
                 );
 

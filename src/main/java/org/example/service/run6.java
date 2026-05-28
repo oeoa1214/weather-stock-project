@@ -92,8 +92,7 @@ public class run6 {
 
     /*
      * 더미 경로
-     * 더미 버튼 누른 뒤에는 이 메서드가 0.5초마다 호출됨
-     * 같은 더미 흐름에서는 += 누적
+
      */
     public Class6 createClass6ByDummy(
             Map<String, Double> todayReturns
@@ -130,6 +129,20 @@ public class run6 {
                     after
             );
         }
+
+        return class6;
+    }
+
+    /*
+     * 평균 분석 경로
+
+     */
+    public Class6 createClass6ByAverageMap(
+            Map<String, Double> averageMap
+    ) {
+        class6.setAverageRates(
+                averageMap
+        );
 
         return class6;
     }
