@@ -20,7 +20,7 @@ public class FoodInfoService {
                                     "맑음",
                                     "샌드위치",
                                     "[외출, 소비 증가, 가벼운 식사]",
-                                    "맑은 날에는 외출과 야외 활동이 늘어나 간편하게 먹기 좋은 음식이 어울립니다.",
+                                    "맑은 날에는  간편하게 먹기 좋은 음식이 어울립니다.",
                                     "가볍게 들고 나가기 좋고, 활동적인 날씨와 잘 맞습니다.",
                                     "/images/food/sunny_sandwich.jpg"
                             ),
@@ -52,7 +52,7 @@ public class FoodInfoService {
                                     "맑음",
                                     "파스타",
                                     "[외식, 소비 증가, 기분전환]",
-                                    "맑은 날에는 외식 수요가 늘어나 분위기 있는 음식이 잘 어울립니다.",
+                                    "맑은 날에는 분위기 있는 음식이 잘 어울립니다.",
                                     "외부 소비 증가 흐름과 연결하기 좋은 메뉴입니다.",
                                     "/images/food/sunny_pasta.jpg"
                             )
@@ -80,7 +80,7 @@ public class FoodInfoService {
                                     "비",
                                     "라면",
                                     "[간편식, 실내, 국물]",
-                                    "비 오는 날에는 실내에서 간편하게 먹을 수 있는 음식이 어울립니다.",
+                                    "비 오는 날에는 실내에서 먹을 수 있는 음식이 어울립니다.",
                                     "조리 시간이 짧고 따뜻한 국물이 있어 비 오는 날에 적합합니다.",
                                     "/images/food/rain_ramen.jpg"
                             ),
@@ -160,7 +160,7 @@ public class FoodInfoService {
                                     "한파",
                                     "전골",
                                     "[뜨거운 음식, 겨울, 보온]",
-                                    "추운 날에는 여러 재료가 들어간 뜨거운 전골이 잘 어울립니다.",
+                                    "추운 날에는 여러 재료가 들어간  전골이 잘 어울립니다.",
                                     "체온 유지와 포만감을 동시에 줄 수 있습니다.",
                                     "/images/food/cold_hotpot.jpg"
                             ),
@@ -168,7 +168,7 @@ public class FoodInfoService {
                                     "한파",
                                     "어묵탕",
                                     "[국물, 겨울간식, 한파]",
-                                    "한파에는 따뜻한 길거리 음식이나 국물 음식이 인기가 높습니다.",
+                                    "한파에는 따뜻한 길거리 음식이나 국물이 인기가 높습니다.",
                                     "추운 날 손쉽게 몸을 데울 수 있는 메뉴입니다.",
                                     "/images/food/cold_odeng.jpg"
                             ),
@@ -196,7 +196,7 @@ public class FoodInfoService {
                                     "미세먼지",
                                     "따뜻한 차",
                                     "[목관리, 수분, 미세먼지]",
-                                    "미세먼지가 많은 날에는 목을 보호하고 수분을 보충하는 음식이 어울립니다.",
+                                    "미세먼지가 많은 날에는  수분을 보충하는 음식이 어울립니다.",
                                     "따뜻한 차는 건조함을 줄이고 컨디션 관리에 도움이 됩니다.",
                                     "/images/food/dust_tea.jpg"
                             ),
@@ -212,7 +212,7 @@ public class FoodInfoService {
                                     "미세먼지",
                                     "요거트",
                                     "[가벼움, 건강식, 실내식]",
-                                    "미세먼지가 심한 날에는 실내에서 간단히 먹을 수 있는 음식이 좋습니다.",
+                                    "미세먼지가 심한 날에는 실내에서  먹을 수 있는 음식이 좋습니다.",
                                     "부담이 적고 간편하게 먹기 좋은 메뉴입니다.",
                                     "/images/food/dust_yogurt.jpg"
                             ),
@@ -251,27 +251,5 @@ public class FoodInfoService {
         );
     }
 
-    public Class9 createFoodInfo(
-            String weatherName
-    ) {
-        return createClass9(
-                weatherName
-        );
-    }
 
-    public Class9 createFood(
-            String weatherName
-    ) {
-        return createClass9(
-                weatherName
-        );
-    }
-
-    public Class9 recommend(
-            String weatherName
-    ) {
-        return createClass9(
-                weatherName
-        );
-    }
 }

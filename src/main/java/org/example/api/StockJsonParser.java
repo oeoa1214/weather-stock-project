@@ -6,7 +6,7 @@ import java.util.List;
 //→ 주가 JSON에서 현재가와 최근 7일 종가만 뽑기
 public final class StockJsonParser {
 
-                 //주식 API 응답 JSON에서 숫자만 뽑아내는 클래스
+    //주식 API 응답 JSON에서 숫자만 뽑아내는 클래스
     private StockJsonParser() {
     }
     //9번줄 생성자에 private
@@ -31,13 +31,13 @@ public final class StockJsonParser {
             int end = json.indexOf("]", start);
             //indexf(a,b) b위치 부터시작해서 a를 찾아라
             String closeData = json.substring(start, end);
-                     //substring=문자열을 자름
+            //substring=문자열을 자름
             String[] values = closeData.split(",");
-                    //split 특정기준을 잘라서 배열로 만듬
+            //split 특정기준을 잘라서 배열로 만듬
             for (int i = 0; i < values.length; i++) {
 
                 if (!values[i].equals("null")) {
-                     //리스트에 추가
+                    //리스트에 추가
                     prices.add(
                             Double.parseDouble(values[i])
                     );

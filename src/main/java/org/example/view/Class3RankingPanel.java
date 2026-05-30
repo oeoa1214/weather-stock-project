@@ -39,13 +39,13 @@ public class Class3RankingPanel extends JPanel {
             new Color(35, 35, 40);
 
     private static final Color POSITIVE_RED =
-            new Color(220, 65, 85);
+            new Color(220, 75, 90);
 
     private static final Color NEGATIVE_BLUE =
-            new Color(65, 110, 210);
+            new Color(70, 120, 220);
 
     private static final Color ZERO_GRAY =
-            new Color(105, 105, 105);
+            new Color(120, 120, 120);
 
     private static final Color SPEECH_BORDER =
             new Color(110, 200, 230);

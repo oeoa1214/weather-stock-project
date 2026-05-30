@@ -19,16 +19,22 @@ import java.net.URL;
 public class FoodCardPanel extends JPanel {
 
     private static final Color CARD_BORDER_COLOR =
-            new Color(205, 210, 215);
+            new Color(230, 200, 220);
 
     private static final Color CARD_TITLE_COLOR =
-            new Color(90, 95, 105);
+            new Color(145, 85, 135);
+
+    private static final Color TEXT_COLOR =
+            new Color(90, 65, 90);
+
+    private static final Color FOOD_COLOR =
+            new Color(155, 80, 140);
 
     private static final int IMAGE_WIDTH =
             250;
 
     private static final int IMAGE_HEIGHT =
-            95;
+            105;
 
     public FoodCardPanel(
             Class9 class9
@@ -56,7 +62,7 @@ public class FoodCardPanel extends JPanel {
                         "9. 오늘의 추천 음식",
                         TitledBorder.LEFT,
                         TitledBorder.TOP,
-                        new Font("맑은 고딕", Font.BOLD, 13),
+                        new Font("휴먼편지체", Font.BOLD, 16),
                         CARD_TITLE_COLOR
                 );
 
@@ -103,11 +109,11 @@ public class FoodCardPanel extends JPanel {
 
         if (imageIcon == null) {
             imageLabel.setText(
-                    "이미지 없음: " + imagePath
+                    "이미지 없음"
             );
 
             imageLabel.setFont(
-                    new Font("맑은 고딕", Font.PLAIN, 12)
+                    new Font("휴먼편지체", Font.PLAIN, 13)
             );
 
             imageLabel.setForeground(
@@ -188,11 +194,11 @@ public class FoodCardPanel extends JPanel {
                 );
 
         textArea.setFont(
-                new Font("맑은 고딕", Font.PLAIN, 12)
+                new Font("휴먼편지체", Font.PLAIN, 14)
         );
 
         textArea.setForeground(
-                new Color(35, 35, 35)
+                TEXT_COLOR
         );
 
         textArea.setEditable(
@@ -213,10 +219,10 @@ public class FoodCardPanel extends JPanel {
 
         textArea.setBorder(
                 BorderFactory.createEmptyBorder(
-                        0,
-                        6,
+                        2,
+                        8,
                         4,
-                        6
+                        8
                 )
         );
 
@@ -226,16 +232,34 @@ public class FoodCardPanel extends JPanel {
     private String createClass9Text(
             Class9 class9
     ) {
-        return "날씨: "
+        return "날씨  "
                 + class9.weatherName()
                 + "\n"
-                + "추천 음식: "
+                + "추천 음식  "
                 + class9.foodName()
                 + "\n\n"
-                + "설명:\n"
-                + class9.description()
+                + createShortDescription(
+                class9.description()
+        )
                 + "\n\n"
-                + "태그: "
+                + "태그  "
                 + class9.tags();
+    }
+
+    private String createShortDescription(
+            String description
+    ) {
+        if (description == null || description.isBlank()) {
+            return "";
+        }
+
+        if (description.length() <= 34) {
+            return description;
+        }
+
+        return description.substring(
+                0,
+                34
+        ) + "...";
     }
 }

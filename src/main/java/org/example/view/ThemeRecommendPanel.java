@@ -54,7 +54,7 @@ public class ThemeRecommendPanel extends JPanel {
                 );
 
         title.setFont(
-                new Font("맑은 고딕", Font.BOLD, 13)
+                new Font("경기천년제목", Font.BOLD, 14)
         );
 
         title.setForeground(
@@ -69,7 +69,7 @@ public class ThemeRecommendPanel extends JPanel {
                 );
 
         textArea.setFont(
-                new Font("맑은 고딕", Font.PLAIN, 14)
+                new Font("경기천년제목", Font.BOLD, 15)
         );
 
         textArea.setForeground(

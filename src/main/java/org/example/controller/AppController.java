@@ -11,85 +11,41 @@ import java.util.Map;
 
 public class AppController {
 
-    /*
-     * =========================================================
-     * [더미모드 연결 1]
-     * DummyModeController는 CSV → Judge2 → Converter → Generator까지만 담당한다.
-     * Class5/Class6 생성은 AppController가 run5/run6로 처리한다.
-     * =========================================================
-     */
     private final DummyModeController dummyModeController =
             new DummyModeController();
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 1]
-     * KospiWeatherAverageController는
-     * KOSPI-날씨 CSV → Judge2 → Converter → 테마별 KOSPI 평균수익률 계산까지만 담당한다.
-     *
-     * 여기서는 Class5를 쓰지 않고, Class6 그래프만 재사용한다.
-     * =========================================================
-     */
     private final KospiWeatherAverageController kospiWeatherAverageController =
             new KospiWeatherAverageController();
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 1]
-     * KospiTemperatureAverageController는
-     * KOSPI-날씨 CSV → 기온 구간 분류 → 구간별 KOSPI 평균수익률 계산까지만 담당한다.
-     *
-     * 여기서는 Class5를 쓰지 않고, Class6 그래프만 재사용한다.
-     * =========================================================
-     */
     private final KospiTemperatureAverageController kospiTemperatureAverageController =
             new KospiTemperatureAverageController();
 
-    /*
-     * =========================================================
-     * [더미모드 연결 2]
-     * run5/run6는 일반 경로와 더미 경로 둘 다 처리한다.
-     * 같은 객체를 필드로 둬야 더미모드에서 7일 큐/누적값이 유지된다.
-     * =========================================================
-     */
     private final run5 run5Service =
             new run5();
 
     private final run6 run6Service =
             new run6();
 
-    /*
-     * =========================================================
-     * [더미모드 연결 3]
-     * View 버튼이 더미모드 시작/정지를 제어할 때 쓰는 상태값
-     * =========================================================
-     */
     private boolean dummyMode =
             false;
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 2]
-     * View 버튼이 KOSPI 평균 모드 시작/정지를 제어할 때 쓰는 상태값
-     * =========================================================
-     */
     private boolean kospiAverageMode =
             false;
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 2]
-     * View 버튼이 KOSPI 기온 모드 시작/정지를 제어할 때 쓰는 상태값
-     * =========================================================
-     */
     private boolean kospiTemperatureMode =
             false;
 
+    private final ViewRun6 viewRun6 =
+            new ViewRun6();
+
+    private final RecommendRefreshService recommendRefreshService =
+            new RecommendRefreshService();
+
+    private List<Hub3Data.Item> lastHub3Items =
+            List.of();
+
     public void run() {
 
-        /*
-         * 1. 날씨 1~2층
-         */
         Stem1 stem1 =
                 new Stem1();
 
@@ -123,25 +79,14 @@ public class AppController {
                         judgedWeather
                 );
 
-        /*
-         * 2. 현재 날씨 → 큰 테마 결정
-         */
         themeMom theme =
                 createThemeByWeather(
                         judgedWeather
                 );
 
-        /*
-         * 3. stocks.csv에서 25개 종목 읽기
-         */
         List<Stock> allStocks =
                 createAllStocks();
 
-        /*
-         * 4. 실제 주식 데이터 생성
-         * Hub3Data.Item = 3번/4번 현재가 흐름용
-         * CloseInfo = 5번/6번 일반 경로용
-         */
         StockPreparedResult stockPreparedResult =
                 createStockPreparedResult(
                         allStocks
@@ -153,11 +98,17 @@ public class AppController {
         List<CloseInfo> closeInfos =
                 stockPreparedResult.closeInfos();
 
-        /*
-         * 5. 3층
-         * themeMom + Hub3Data.Item 목록
-         * → hub3 → Hub3Data → Judge3 → Delivery3 → Stem3
-         */
+        lastHub3Items =
+                hub3Items;
+
+        run7 run7 =
+                new run7();
+
+        List<Class7> class7Result =
+                run7.createClass7List(
+                        hub3Items
+                );
+
         hub3 hub3 =
                 new hub3();
 
@@ -187,10 +138,6 @@ public class AppController {
                 delivery3
         );
 
-        /*
-         * 6. 3번 화면
-         * Stem3 → run3 → Class3
-         */
         run3 run3 =
                 new run3();
 
@@ -199,10 +146,6 @@ public class AppController {
                         stem3.sendToRun3()
                 );
 
-        /*
-         * 7. 4번 대표 추천
-         * Stem3 → Stem4 → Judge4 → Delivery4 → run4 → Class4
-         */
         Stem4 stem4 =
                 new Stem4();
 
@@ -226,18 +169,6 @@ public class AppController {
                         delivery4
                 );
 
-        /*
-         * 8. 5번/6번 일반 경로
-         *
-         * 일반 실행:
-         * CloseInfo → run5Service → Class5
-         * CloseInfo → run6Service → Class6
-         *
-         * 더미 실행:
-         * DummyModeController가 만든 dailyThemeAverageReturns
-         * → run5Service.createClass5ByDummy()
-         * → run6Service.createClass6ByDummy()
-         */
         Class5 class5Result =
                 run5Service.createClass5ByCloseInfo(
                         closeInfos
@@ -248,9 +179,6 @@ public class AppController {
                         closeInfos
                 );
 
-        /*
-         * 9. 음식 추천
-         */
         run9 run9Service =
                 new run9();
 
@@ -259,53 +187,18 @@ public class AppController {
                         judgedWeather.getName()
                 );
 
-        /*
-         * 10. 콘솔 출력 확인
-         */
-        System.out.println("===== Class1 현재 날씨 =====");
-        System.out.println(class1);
-
-        System.out.println("===== 현재 테마 =====");
-        System.out.println(theme.getThemeName());
-
-        System.out.println("===== Class3 추천 종목 Top 5 =====");
-        System.out.println(class3Result);
-
-        System.out.println("===== Class4 대표 추천 =====");
-        System.out.println(class4);
-
-        System.out.println("===== Class5 최근 7일 테마 성과 =====");
-        System.out.println(class5Result);
-
-        System.out.println("===== Class6 테마별 누적수익률 =====");
-        System.out.println(class6Result);
-
-        System.out.println("===== Class9 음식 추천 =====");
-        System.out.println(class9);
-
         new MainFrame(
                 class1,
                 class4,
                 class3Result,
                 class5Result,
                 class6Result,
+                class7Result,
                 class9,
                 this
         );
     }
 
-    /*
-     * =========================================================
-     * [더미모드 연결 4]
-     * 8번 버튼이 처음 눌렸을 때 호출할 메서드
-     *
-     * 역할:
-     * - 더미모드 ON
-     * - CSV 365일 다시 처음부터 시작
-     * - run5 더미 7일 큐 초기화
-     * - run6 더미 누적수익률 초기화
-     * =========================================================
-     */
     public void startDummyMode() {
         startDummyMode(
                 "data/daegu_weather.csv"
@@ -327,24 +220,6 @@ public class AppController {
         run6Service.resetDummy();
     }
 
-    /*
-     * =========================================================
-     * [더미모드 연결 5]
-     * View의 Timer가 0.5초마다 호출할 메서드
-     *
-     * bonusLevel:
-     * 0 → 보정 없음
-     * 1 → 적중 테마 0~1% 보정
-     * 2 → 적중 테마 0~2% 보정
-     * 3 → 적중 테마 0~3% 보정
-     *
-     * 흐름:
-     * DummyModeController
-     * → dailyThemeAverageReturns 생성
-     * → AppController가 run5/run6에 전달
-     * → Class5/Class6 결과 반환
-     * =========================================================
-     */
     public DummyStepResult runDummyOneDay(
             int bonusLevel
     ) {
@@ -406,49 +281,19 @@ public class AppController {
         );
     }
 
-    /*
-     * =========================================================
-     * [더미모드 연결 6]
-     * View의 정지 버튼 또는 365일 완료 시 호출할 수 있는 메서드
-     * =========================================================
-     */
     public void stopDummyMode() {
         dummyMode =
                 false;
     }
 
-    /*
-     * =========================================================
-     * [더미모드 연결 7]
-     * View가 현재 더미모드 실행 중인지 확인할 때 사용
-     * =========================================================
-     */
     public boolean isDummyMode() {
         return dummyMode;
     }
 
-    /*
-     * =========================================================
-     * [더미모드 연결 8]
-     * View가 365일 완료 여부 확인할 때 사용
-     * =========================================================
-     */
     public boolean isDummyModeFinished() {
         return dummyModeController.isFinished();
     }
 
-    /*
-     * =========================================================
-     * [더미모드 연결 9]
-     * View가 Timer 한 번 실행 후 받을 결과 묶음
-     *
-     * View는 여기서:
-     * - currentDay / totalDay로 날짜 카운터 표시
-     * - weatherName / themeName으로 8번 상태 표시
-     * - class5Result로 5번 갱신
-     * - class6Result로 6번 갱신
-     * =========================================================
-     */
     public record DummyStepResult(
             boolean finished,
             int currentDay,
@@ -460,19 +305,6 @@ public class AppController {
     ) {
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 3]
-     * KOSPI 평균 모드 시작 메서드
-     *
-     * 역할:
-     * - KOSPI 평균 모드 ON
-     * - data/kospi_weather_2025.csv 처음부터 시작
-     * - run6 더미 상태 초기화
-     *
-     * 이 모드는 Class5를 사용하지 않고 Class6 그래프만 갱신한다.
-     * =========================================================
-     */
     public void startKospiAverageMode() {
         kospiAverageMode =
                 true;
@@ -481,26 +313,11 @@ public class AppController {
                 "data/kospi_weather_2025.csv"
         );
 
+        run5Service.resetDummy();
+
         run6Service.resetDummy();
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 4]
-     * View의 Timer가 0.5초마다 호출할 메서드
-     *
-     * 흐름:
-     * KospiWeatherAverageController
-     * → 하루치 KOSPI 수익률을 해당 날씨 테마에 반영
-     * → 테마별 평균 KOSPI 수익률 Map 반환
-     * → AppController가 run6에 전달
-     * → Class6 결과 반환
-     *
-     * 주의:
-     * run6는 원래 누적용이므로, 여기서는 매번 reset 후 평균 Map을 한 번만 넣어
-     * Class6 그래프를 "평균수익률 표시용"으로 재사용한다.
-     * =========================================================
-     */
     public KospiAverageStepResult runKospiAverageOneDay() {
         if (!kospiAverageMode) {
             throw new IllegalStateException(
@@ -516,17 +333,24 @@ public class AppController {
                     true,
                     kospiWeatherAverageController.getCurrentDay(),
                     kospiWeatherAverageController.getTotalDay(),
-                    run6Service.getClass6()
+                    "완료",
+                    run5Service.getClass5(),
+                    run6Service.getClass6(),
+                    kospiWeatherAverageController.getProgressData()
             );
         }
 
         Map<String, Double> averageReturnMap =
                 kospiWeatherAverageController.nextDay();
 
-        /*
-         * run6Service는 누적 구조이므로,
-         * KOSPI 평균 모드에서는 매 tick마다 reset 후 평균값 Map을 한 번만 넣는다.
-         */
+        Map<String, Double> dailyThemeReturnMap =
+                kospiWeatherAverageController.getLastDailyThemeReturnMap();
+
+        Class5 class5Result =
+                run5Service.createClass5ByDummy(
+                        dailyThemeReturnMap
+                );
+
         run6Service.resetDummy();
 
         Class6 class6Result =
@@ -546,62 +370,33 @@ public class AppController {
                 finished,
                 kospiWeatherAverageController.getCurrentDay(),
                 kospiWeatherAverageController.getTotalDay(),
-                class6Result
+                kospiWeatherAverageController.getCurrentDate(),
+                class5Result,
+                class6Result,
+                kospiWeatherAverageController.getProgressData()
         );
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 5]
-     * View의 정지 버튼 또는 완료 시 호출할 수 있는 메서드
-     * =========================================================
-     */
     public void stopKospiAverageMode() {
         kospiAverageMode =
                 false;
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 6]
-     * View가 현재 KOSPI 평균 모드 실행 중인지 확인할 때 사용
-     * =========================================================
-     */
     public boolean isKospiAverageMode() {
         return kospiAverageMode;
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 평균 모드 연결 7]
-     * View가 Timer 한 번 실행 후 받을 결과 묶음
-     *
-     * View는 여기서:
-     * - currentDay / totalDay로 날짜 카운터 표시
-     * - class6Result로 6번 그래프 갱신
-     * =========================================================
-     */
     public record KospiAverageStepResult(
             boolean finished,
             int currentDay,
             int totalDay,
-            Class6 class6Result
+            String date,
+            Class5 class5Result,
+            Class6 class6Result,
+            AnalysisProgressData progressData
     ) {
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 3]
-     * KOSPI 기온 분석 모드 시작 메서드
-     *
-     * 역할:
-     * - KOSPI 기온 모드 ON
-     * - data/kospi_weather_2025.csv 처음부터 시작
-     * - run6 더미 상태 초기화
-     *
-     * 이 모드는 Class5를 사용하지 않고 Class6 그래프만 갱신한다.
-     * =========================================================
-     */
     public void startKospiTemperatureMode() {
         kospiTemperatureMode =
                 true;
@@ -613,23 +408,6 @@ public class AppController {
         run6Service.resetDummy();
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 4]
-     * View의 Timer가 0.5초마다 호출할 메서드
-     *
-     * 흐름:
-     * KospiTemperatureAverageController
-     * → 하루치 KOSPI 수익률을 해당 기온 구간에 반영
-     * → 기온 구간별 평균 KOSPI 수익률 Map 반환
-     * → AppController가 run6에 전달
-     * → Class6 결과 반환
-     *
-     * 주의:
-     * run6는 원래 누적용이므로, 여기서는 매번 reset 후 평균 Map을 한 번만 넣어
-     * Class6 그래프를 "기온 구간별 평균수익률 표시용"으로 재사용한다.
-     * =========================================================
-     */
     public KospiTemperatureStepResult runKospiTemperatureOneDay() {
         if (!kospiTemperatureMode) {
             throw new IllegalStateException(
@@ -645,17 +423,14 @@ public class AppController {
                     true,
                     kospiTemperatureAverageController.getCurrentDay(),
                     kospiTemperatureAverageController.getTotalDay(),
-                    run6Service.getClass6()
+                    run6Service.getClass6(),
+                    kospiTemperatureAverageController.getProgressData()
             );
         }
 
         Map<String, Double> averageReturnMap =
                 kospiTemperatureAverageController.nextDay();
 
-        /*
-         * run6Service는 누적 구조이므로,
-         * KOSPI 기온 모드에서는 매 tick마다 reset 후 평균값 Map을 한 번만 넣는다.
-         */
         run6Service.resetDummy();
 
         Class6 class6Result =
@@ -675,47 +450,53 @@ public class AppController {
                 finished,
                 kospiTemperatureAverageController.getCurrentDay(),
                 kospiTemperatureAverageController.getTotalDay(),
-                class6Result
+                class6Result,
+                kospiTemperatureAverageController.getProgressData()
         );
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 5]
-     * View의 정지 버튼 또는 완료 시 호출할 수 있는 메서드
-     * =========================================================
-     */
     public void stopKospiTemperatureMode() {
         kospiTemperatureMode =
                 false;
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 6]
-     * View가 현재 KOSPI 기온 모드 실행 중인지 확인할 때 사용
-     * =========================================================
-     */
     public boolean isKospiTemperatureMode() {
         return kospiTemperatureMode;
     }
 
-    /*
-     * =========================================================
-     * [KOSPI 기온 모드 연결 7]
-     * View가 Timer 한 번 실행 후 받을 결과 묶음
-     *
-     * View는 여기서:
-     * - currentDay / totalDay로 날짜 카운터 표시
-     * - class6Result로 6번 그래프 갱신
-     * =========================================================
-     */
     public record KospiTemperatureStepResult(
             boolean finished,
             int currentDay,
             int totalDay,
+            Class6 class6Result,
+            AnalysisProgressData progressData
+    ) {
+    }
+
+    public RecommendRefreshResult createRecommendRefreshResult(
             Class6 class6Result
     ) {
+        if (class6Result == null) {
+            throw new IllegalArgumentException(
+                    "Class6 결과는 null일 수 없습니다."
+            );
+        }
+
+        if (lastHub3Items == null || lastHub3Items.isEmpty()) {
+            throw new IllegalStateException(
+                    "저장된 hub3Items가 없습니다. 일반 실행 흐름이 먼저 완료되어야 합니다."
+            );
+        }
+
+        ViewClass6 viewClass6 =
+                viewRun6.createViewClass6(
+                        class6Result
+                );
+
+        return recommendRefreshService.createRecommendRefreshResult(
+                viewClass6,
+                lastHub3Items
+        );
     }
 
     private themeMom createThemeByWeather(
@@ -755,6 +536,31 @@ public class AppController {
         return stocks;
     }
 
+    private double calculateRealtimeReturnRate(
+            double currentPrice,
+            List<Double> closePrices
+    ) {
+        if (currentPrice <= 0) {
+            return 0.0;
+        }
+
+        if (closePrices == null || closePrices.size() < 2) {
+            return 0.0;
+        }
+
+        double previousClose =
+                closePrices.get(
+                        closePrices.size() - 2
+                );
+
+        if (previousClose <= 0) {
+            return 0.0;
+        }
+
+        return ((currentPrice - previousClose)
+                / previousClose) * 100.0;
+    }
+
     private StockPreparedResult createStockPreparedResult(
             List<Stock> stocks
     ) {
@@ -767,6 +573,9 @@ public class AppController {
         Realtime realtime =
                 new Realtime();
 
+        Parsing parsing =
+                new Parsing();
+
         List<Hub3Data.Item> hub3Items =
                 new ArrayList<>();
 
@@ -775,23 +584,29 @@ public class AppController {
 
         for (Stock stock : stocks) {
             try {
-                String json =
+                String realtimeJson =
                         realtime.getStockJson(
+                                stock
+                        );
+
+                String closeJson =
+                        parsing.getStockJson(
                                 stock
                         );
 
                 double currentPrice =
                         realtime.getCurrentPrice(
-                                json
+                                realtimeJson
                         );
 
                 List<Double> closePrices =
                         realtime.getClosePrices(
-                                json
+                                closeJson
                         );
 
                 double returnRate =
-                        realtime.getReturnRate(
+                        calculateRealtimeReturnRate(
+                                currentPrice,
                                 closePrices
                         );
 

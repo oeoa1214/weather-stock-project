@@ -1,7 +1,9 @@
 package org.example.controller;
 
+import org.example.model.AnalysisProgressData;
 import org.example.service.KospiWeatherCsvReader;
 import org.example.service.KospiWeatherDay;
+import org.example.service.TemperatureWeatherMapper;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +26,24 @@ public class KospiTemperatureAverageController {
     private int index =
             0;
 
+    private String currentDate =
+            "";
+
+    private String currentTemperatureRange =
+            "";
+
+    private String colorWeatherName =
+            "맑음";
+
+    private double currentAverageTemperature =
+            0.0;
+
+    private double currentPrecipitation =
+            0.0;
+
+    private double currentPm10 =
+            0.0;
+
     public void start(
             String filePath
     ) {
@@ -34,6 +54,24 @@ public class KospiTemperatureAverageController {
 
         index =
                 0;
+
+        currentDate =
+                "";
+
+        currentTemperatureRange =
+                "";
+
+        colorWeatherName =
+                "맑음";
+
+        currentAverageTemperature =
+                0.0;
+
+        currentPrecipitation =
+                0.0;
+
+        currentPm10 =
+                0.0;
 
         resetMaps();
     }
@@ -67,6 +105,35 @@ public class KospiTemperatureAverageController {
         return days.size();
     }
 
+    public String getCurrentDate() {
+        return currentDate;
+    }
+
+    public Map<String, Integer> getCountMap() {
+        return new LinkedHashMap<>(
+                countMap
+        );
+    }
+
+    public AnalysisProgressData getProgressData() {
+        return new AnalysisProgressData(
+                index,
+                days.size(),
+                currentDate,
+                currentTemperatureRange,
+                colorWeatherName,
+                currentAverageTemperature,
+                currentPrecipitation,
+                currentPm10,
+                new LinkedHashMap<>(
+                        countMap
+                ),
+                new LinkedHashMap<>(
+                        countMap
+                )
+        );
+    }
+
     public Map<String, Double> nextDay() {
         if (days.isEmpty()) {
             throw new IllegalStateException(
@@ -83,9 +150,29 @@ public class KospiTemperatureAverageController {
                         index
                 );
 
+        currentDate =
+                day.date();
+
+        currentAverageTemperature =
+                day.averageTemperature();
+
+        currentPrecipitation =
+                day.precipitation();
+
+        currentPm10 =
+                day.pm10();
+
         String temperatureRange =
                 getTemperatureRange(
                         day.averageTemperature()
+                );
+
+        currentTemperatureRange =
+                temperatureRange;
+
+        colorWeatherName =
+                TemperatureWeatherMapper.toWeatherNameByRange(
+                        temperatureRange
                 );
 
         double currentSum =

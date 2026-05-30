@@ -254,7 +254,7 @@ public class Class6GraphPanel extends JPanel {
     ) {
         String text =
                 String.format(
-                        "%+.1f%%",
+                        "%+.2f%%",
                         rate
                 );
 

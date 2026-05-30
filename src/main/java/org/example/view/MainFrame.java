@@ -1,12 +1,16 @@
 package org.example.view;
 
 import org.example.controller.AppController;
+import org.example.model.AnalysisProgressData;
 import org.example.model.Class1;
 import org.example.model.Class3;
 import org.example.model.Class4;
 import org.example.model.Class5;
 import org.example.model.Class6;
+import org.example.model.Class7;
 import org.example.model.Class9;
+import org.example.model.RecommendRefreshResult;
+import org.example.service.Class7AppliedRateCalculator;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -20,16 +24,21 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.Map;
 
 public class MainFrame extends JFrame {
 
     private final AppController appController;
     private final Class1 class1;
+    private final List<Class7> class7Result;
 
     private JPanel weatherCardPanel;
     private JPanel rootPanel;
     private JPanel gridPanel;
     private JLabel titleLabel;
+
+    private final Class7AppliedRateCalculator class7AppliedRateCalculator =
+            new Class7AppliedRateCalculator();
 
     private Color backgroundColor;
     private Color textColor;
@@ -40,11 +49,15 @@ public class MainFrame extends JFrame {
             List<Class3> class3Result,
             Class5 class5Result,
             Class6 class6Result,
+            List<Class7> class7Result,
             Class9 class9,
             AppController appController
     ) {
         this.class1 =
                 class1;
+
+        this.class7Result =
+                class7Result;
 
         this.appController =
                 appController;
@@ -53,7 +66,7 @@ public class MainFrame extends JFrame {
                 class1.condition().getName()
         );
 
-        setTitle("실시간 날씨 기반 주식 테마 추천 분석 의사결정 시스템");
+        setTitle("날씨 기반 주식 테마 다 각도 의사결정 결정 지원 시스템");
         setSize(1200, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,12 +86,12 @@ public class MainFrame extends JFrame {
 
         titleLabel =
                 new JLabel(
-                        "Weather-Stock Dashboard",
+                        "WeatherStock prismatic analytic  decision support system",
                         SwingConstants.CENTER
                 );
 
         titleLabel.setFont(
-                new Font("맑은 고딕", Font.BOLD, 28)
+                new Font("경기천년제목", Font.BOLD, 22)
         );
 
         titleLabel.setForeground(
@@ -148,13 +161,18 @@ public class MainFrame extends JFrame {
         );
 
         gridPanel.add(
-                new OPSimulationPanel()
+                new CardPanel(
+                        "7. 테마 대표 종목 현황",
+                        new Class7ThemeStockPanel(
+                                class7Result
+                        )
+                )
         );
 
         gridPanel.add(
                 new CardPanel(
                         "8. 지역별 날씨·KOSPI 분석 모드",
-                        new DummyModePanel(
+                        new Class8AnalysisPanel(
                                 appController,
                                 this::applyDummyStepResult,
                                 this::applyKospiAverageStepResult,
@@ -291,7 +309,7 @@ public class MainFrame extends JFrame {
                 );
 
         title.setFont(
-                new Font("맑은 고딕", Font.BOLD, 13)
+                new Font("경기천년제목", Font.BOLD, 13)
         );
 
         title.setForeground(
@@ -314,7 +332,7 @@ public class MainFrame extends JFrame {
                 );
 
         temperatureLabel.setFont(
-                new Font("맑은 고딕", Font.BOLD, 42)
+                new Font("경기천년제목", Font.BOLD, 42)
         );
 
         temperatureLabel.setForeground(
@@ -330,7 +348,7 @@ public class MainFrame extends JFrame {
                 );
 
         weatherLabel.setFont(
-                new Font("맑은 고딕", Font.BOLD, 18)
+                new Font("경기천년제목", Font.BOLD, 18)
         );
 
         weatherLabel.setForeground(
@@ -431,6 +449,188 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
+    private JPanel createAnalysisWeatherCard(
+            AnalysisProgressData progressData
+    ) {
+        String weatherName =
+                progressData.colorWeatherName();
+
+        Color cardColor =
+                getWeatherCardMainColor(
+                        weatherName
+                );
+
+        JPanel panel =
+                new JPanel(
+                        new BorderLayout(10, 10)
+                );
+
+        panel.setBackground(
+                cardColor
+        );
+
+        panel.setBorder(
+                BorderFactory.createEmptyBorder(
+                        12,
+                        12,
+                        12,
+                        12
+                )
+        );
+
+        JLabel title =
+                new JLabel(
+                        "1. 분석 날짜 날씨 정보",
+                        SwingConstants.LEFT
+                );
+
+        title.setFont(
+                new Font("경기천년제목", Font.BOLD, 13)
+        );
+
+        title.setForeground(
+                Color.WHITE
+        );
+
+        JPanel centerPanel =
+                new JPanel(
+                        new BorderLayout(10, 10)
+                );
+
+        centerPanel.setOpaque(
+                false
+        );
+
+        JLabel temperatureLabel =
+                new JLabel(
+                        String.format(
+                                "%.1f℃",
+                                progressData.averageTemperature()
+                        ),
+                        SwingConstants.LEFT
+                );
+
+        temperatureLabel.setFont(
+                new Font("경기천년제목", Font.BOLD, 42)
+        );
+
+        temperatureLabel.setForeground(
+                Color.WHITE
+        );
+
+        JLabel weatherLabel =
+                new JLabel(
+                        weatherName + "  " + getWeatherEnglishName(
+                                weatherName
+                        ),
+                        SwingConstants.LEFT
+                );
+
+        weatherLabel.setFont(
+                new Font("경기천년제목", Font.BOLD, 18)
+        );
+
+        weatherLabel.setForeground(
+                Color.WHITE
+        );
+
+        JPanel textPanel =
+                new JPanel(
+                        new GridLayout(2, 1)
+                );
+
+        textPanel.setOpaque(
+                false
+        );
+
+        textPanel.add(
+                temperatureLabel
+        );
+
+        textPanel.add(
+                weatherLabel
+        );
+
+        JLabel iconLabel =
+                new JLabel(
+                        getWeatherMascot(
+                                weatherName
+                        ),
+                        SwingConstants.CENTER
+                );
+
+        iconLabel.setFont(
+                new Font("Segoe UI Emoji", Font.PLAIN, 48)
+        );
+
+        iconLabel.setForeground(
+                Color.WHITE
+        );
+
+        centerPanel.add(
+                textPanel,
+                BorderLayout.CENTER
+        );
+
+        panel.add(
+                iconLabel,
+                BorderLayout.EAST
+        );
+
+        JPanel detailPanel =
+                new JPanel(
+                        new GridLayout(2, 2, 4, 2)
+                );
+
+        detailPanel.setOpaque(
+                false
+        );
+
+        detailPanel.add(
+                createWeatherDetailLabel(
+                        "날짜 " + progressData.currentDate()
+                )
+        );
+
+        detailPanel.add(
+                createWeatherDetailLabel(
+                        "진행 "
+                                + progressData.currentDay()
+                                + "/"
+                                + progressData.totalDay()
+                )
+        );
+
+        detailPanel.add(
+                createWeatherDetailLabel(
+                        "강수량 " + progressData.precipitation()
+                )
+        );
+
+        detailPanel.add(
+                createWeatherDetailLabel(
+                        "미세먼지 " + progressData.pm10()
+                )
+        );
+
+        panel.add(
+                title,
+                BorderLayout.NORTH
+        );
+
+        panel.add(
+                centerPanel,
+                BorderLayout.CENTER
+        );
+
+        panel.add(
+                detailPanel,
+                BorderLayout.SOUTH
+        );
+
+        return panel;
+    }
+
     private JLabel createWeatherDetailLabel(
             String text
     ) {
@@ -441,7 +641,7 @@ public class MainFrame extends JFrame {
                 );
 
         label.setFont(
-                new Font("맑은 고딕", Font.PLAIN, 12)
+                new Font("경기천년제목", Font.BOLD, 12)
         );
 
         label.setForeground(
@@ -473,7 +673,7 @@ public class MainFrame extends JFrame {
                         title,
                         TitledBorder.LEFT,
                         TitledBorder.TOP,
-                        new Font("맑은 고딕", Font.BOLD, 13),
+                        new Font("경기천년제목", Font.BOLD, 13),
                         new Color(80, 70, 90)
                 );
 
@@ -511,6 +711,47 @@ public class MainFrame extends JFrame {
         gridPanel.add(
                 component,
                 index
+        );
+    }
+
+    private void applyAnalysisProgressVisual(
+            AnalysisProgressData progressData
+    ) {
+        if (progressData == null) {
+            return;
+        }
+
+        applyColorFields(
+                progressData.colorWeatherName()
+        );
+
+        rootPanel.setBackground(
+                backgroundColor
+        );
+
+        gridPanel.setBackground(
+                backgroundColor
+        );
+
+        titleLabel.setForeground(
+                textColor
+        );
+
+        JPanel newWeatherCardPanel =
+                createAnalysisWeatherCard(
+                        progressData
+                );
+
+        gridPanel.remove(
+                weatherCardPanel
+        );
+
+        weatherCardPanel =
+                newWeatherCardPanel;
+
+        gridPanel.add(
+                weatherCardPanel,
+                0
         );
     }
 
@@ -554,13 +795,56 @@ public class MainFrame extends JFrame {
             return;
         }
 
+        applyAnalysisProgressVisual(
+                result.progressData()
+        );
+
+        replaceGridCard(
+                4,
+                new CardPanel(
+                        "5. 최근 7거래일 KOSPI 날씨 테마 누적 성과",
+                        new Class5ScoreboardPanel(
+                                result.class5Result()
+                        )
+                )
+        );
+
         replaceGridCard(
                 5,
                 createClass6Card(
-                        "6. 연간 코스피 적중테마 평균 수익률",
+                        "6. 날씨별 KOSPI 일일 평균 수익률",
                         result.class6Result()
                 )
         );
+
+        Map<String, Double> appliedRateMap =
+                class7AppliedRateCalculator.createAppliedRateMapByCount(
+                        result.class6Result(),
+                        result.progressData().appliedCountMap()
+                );
+
+        replaceGridCard(
+                6,
+                new CardPanel(
+                        "7. KOSPI 누적 반영 테마 대표가",
+                        new Class7ThemeStockPanel(
+                                class7Result,
+                                appliedRateMap,
+                                "KOSPI 누적 반영 대표 종목"
+                        )
+                )
+        );
+
+        if (result.finished()) {
+            RecommendRefreshResult refreshResult =
+                    appController.createRecommendRefreshResult(
+                            result.class6Result()
+                    );
+
+            applyRecommendRefreshResult(
+                    refreshResult
+            );
+        }
 
         gridPanel.revalidate();
         gridPanel.repaint();
@@ -573,16 +857,52 @@ public class MainFrame extends JFrame {
             return;
         }
 
+        applyAnalysisProgressVisual(
+                result.progressData()
+        );
+
         replaceGridCard(
                 5,
                 createClass6Card(
-                        "6. 기온 구간별 KOSPI 일일 평균 수익률",
+                        "6. 기온 구간별 KOSPI 하루 평균 수익률",
                         result.class6Result()
                 )
         );
 
         gridPanel.revalidate();
         gridPanel.repaint();
+    }
+
+    private void applyRecommendRefreshResult(
+            RecommendRefreshResult result
+    ) {
+        if (result == null) {
+            return;
+        }
+
+        replaceGridCard(
+                1,
+                new ThemeRecommendPanel(
+                        result.class4()
+                )
+        );
+
+        replaceGridCard(
+                2,
+                new CardPanel(
+                        "3. 추천 종목 Top 5",
+                        new Class3RankingPanel(
+                                result.class3Result()
+                        )
+                )
+        );
+
+        replaceGridCard(
+                8,
+                new FoodCardPanel(
+                        result.class9()
+                )
+        );
     }
 
     private void applyColorFields(
@@ -634,7 +954,7 @@ public class MainFrame extends JFrame {
         }
 
         if (weatherName.equals("미세먼지")) {
-            return " ☆ ";
+            return "◎";
         }
 
         if (weatherName.equals("한파")) {

@@ -187,17 +187,20 @@ public class run5 {
     private double calculateReturnRateByDailyRates(
             Queue<Double> dailyRates
     ) {
-        double value =
-                100.0;
-
-        for (double dailyRate : dailyRates) {
-            value =
-                    value * (1.0 + dailyRate / 100.0);
+        if (dailyRates == null || dailyRates.isEmpty()) {
+            return 0.0;
         }
 
-        return value - 100.0;
-    }
+        double sum =
+                0.0;
 
+        for (double dailyRate : dailyRates) {
+            sum +=
+                    dailyRate;
+        }
+
+        return sum;
+    }
     private Map<String, Double> createEmptyDoubleMap() {
         Map<String, Double> map =
                 new LinkedHashMap<>();
