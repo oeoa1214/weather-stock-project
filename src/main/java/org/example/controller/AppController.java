@@ -3,9 +3,7 @@ package org.example.controller;
 import org.example.view.MainFrame;
 import org.example.model.*;
 import org.example.service.*;
-import org.example.util.StockFileReader;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +17,9 @@ public class AppController {
 
     private final KospiTemperatureAverageController kospiTemperatureAverageController =
             new KospiTemperatureAverageController();
+
+    private final StockController stockController =
+            new StockController();
 
     private final run5 run5Service =
             new run5();
@@ -84,19 +85,14 @@ public class AppController {
                         judgedWeather
                 );
 
-        List<Stock> allStocks =
-                createAllStocks();
-
-        StockPreparedResult stockPreparedResult =
-                createStockPreparedResult(
-                        allStocks
-                );
+        StockControllerData stockControllerData =
+                stockController.prepareAllStocks();
 
         List<Hub3Data.Item> hub3Items =
-                stockPreparedResult.hub3Items();
+                stockControllerData.hub3Items();
 
         List<CloseInfo> closeInfos =
-                stockPreparedResult.closeInfos();
+                stockControllerData.closeInfos();
 
         lastHub3Items =
                 hub3Items;
@@ -519,171 +515,5 @@ public class AppController {
         }
 
         return new AirCareTheme();
-    }
-
-    private List<Stock> createAllStocks() {
-
-        List<Stock> stocks =
-                StockFileReader.loadAllStocks();
-
-        if (stocks.size() != 25) {
-            throw new IllegalStateException(
-                    "전체 종목 수가 25개가 아닙니다. 현재 개수: "
-                            + stocks.size()
-            );
-        }
-
-        return stocks;
-    }
-
-    private double calculateRealtimeReturnRate(
-            double currentPrice,
-            List<Double> closePrices
-    ) {
-        if (currentPrice <= 0) {
-            return 0.0;
-        }
-
-        if (closePrices == null || closePrices.size() < 2) {
-            return 0.0;
-        }
-
-        double previousClose =
-                closePrices.get(
-                        closePrices.size() - 2
-                );
-
-        if (previousClose <= 0) {
-            return 0.0;
-        }
-
-        return ((currentPrice - previousClose)
-                / previousClose) * 100.0;
-    }
-
-    private StockPreparedResult createStockPreparedResult(
-            List<Stock> stocks
-    ) {
-        if (stocks == null || stocks.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "주식 목록은 비어 있을 수 없습니다."
-            );
-        }
-
-        Realtime realtime =
-                new Realtime();
-
-        Parsing parsing =
-                new Parsing();
-
-        List<Hub3Data.Item> hub3Items =
-                new ArrayList<>();
-
-        List<CloseInfo> closeInfos =
-                new ArrayList<>();
-
-        for (Stock stock : stocks) {
-            try {
-                String realtimeJson =
-                        realtime.getStockJson(
-                                stock
-                        );
-
-                String closeJson =
-                        parsing.getStockJson(
-                                stock
-                        );
-
-                double currentPrice =
-                        realtime.getCurrentPrice(
-                                realtimeJson
-                        );
-
-                List<Double> closePrices =
-                        realtime.getClosePrices(
-                                closeJson
-                        );
-
-                double returnRate =
-                        calculateRealtimeReturnRate(
-                                currentPrice,
-                                closePrices
-                        );
-
-                hub3Items.add(
-                        new Hub3Data.Item(
-                                stock.getName(),
-                                stock.getSymbol(),
-                                stock.getTheme(),
-                                currentPrice,
-                                returnRate
-                        )
-                );
-
-                closeInfos.add(
-                        new CloseInfo(
-                                stock,
-                                closePrices
-                        )
-                );
-
-                Thread.sleep(
-                        300
-                );
-
-            } catch (Exception e) {
-                System.out.println(
-                        stock.getName()
-                                + " 주식 정보 생성 실패"
-                );
-            }
-        }
-
-        if (hub3Items.isEmpty()) {
-            throw new IllegalStateException(
-                    "Hub3Data.Item 생성 결과가 비어 있습니다."
-            );
-        }
-
-        if (closeInfos.isEmpty()) {
-            throw new IllegalStateException(
-                    "CloseInfo 생성 결과가 비어 있습니다."
-            );
-        }
-
-        return new StockPreparedResult(
-                hub3Items,
-                closeInfos
-        );
-    }
-
-    private record StockPreparedResult(
-            List<Hub3Data.Item> hub3Items,
-            List<CloseInfo> closeInfos
-    ) {
-
-        private StockPreparedResult {
-            if (hub3Items == null || hub3Items.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "hub3Items는 비어 있을 수 없습니다."
-                );
-            }
-
-            if (closeInfos == null || closeInfos.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "closeInfos는 비어 있을 수 없습니다."
-                );
-            }
-
-            hub3Items =
-                    List.copyOf(
-                            hub3Items
-                    );
-
-            closeInfos =
-                    List.copyOf(
-                            closeInfos
-                    );
-        }
     }
 }

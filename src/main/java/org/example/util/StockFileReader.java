@@ -53,8 +53,11 @@ public final class StockFileReader {
 
                 stocks.add(
                         new Stock(
+
                                 name,
+                                //api호출
                                 symbol,
+                                //
                                 theme
                         )
                 );
@@ -68,26 +71,5 @@ public final class StockFileReader {
         }
 
         return stocks;
-    }
-
-    public static List<Stock> loadStocksByTheme(
-            String targetTheme
-    ) {
-        if (targetTheme == null || targetTheme.isBlank()) {
-            throw new IllegalArgumentException(
-                    "targetTheme은 비어 있을 수 없습니다."
-            );
-        }
-
-        List<Stock> result =
-                new ArrayList<>();
-
-        for (Stock stock : loadAllStocks()) {
-            if (stock.getTheme().equals(targetTheme)) {
-                result.add(stock);
-            }
-        }
-
-        return result;
     }
 }

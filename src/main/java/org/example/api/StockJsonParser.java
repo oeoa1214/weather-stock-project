@@ -11,6 +11,7 @@ public final class StockJsonParser {
     }
     //9번줄 생성자에 private
     //json 문자열
+    //현재가는 한개 종가는 여러개라서 리스트더블
     public static List<Double> parseClosePrices(String json) {
 
         List<Double> prices = new ArrayList<>();
@@ -29,7 +30,7 @@ public final class StockJsonParser {
             start += closeKey.length();
 
             int end = json.indexOf("]", start);
-            //indexf(a,b) b위치 부터시작해서 a를 찾아라
+            //indexof(a,b) b위치 부터시작해서 a를 찾아라
             String closeData = json.substring(start, end);
             //substring=문자열을 자름
             String[] values = closeData.split(",");
@@ -50,7 +51,7 @@ public final class StockJsonParser {
 
         return prices;
     }
-
+//문자열 받아서 double로반환
     public static double parseCurrentPrice(String json) {
 
         try {

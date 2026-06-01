@@ -14,12 +14,12 @@ public final class StockApiClient {
 
     // 5번 / 6번 CloseInfo용: 최근 7일 일봉 JSON
     public static String getStockData(String symbol) {
-
+     //☆★멸만들어서 requset+ symbol은 파일리더 stock.csv에서 받아옴
         final String apiUrl =
                 "https://query1.finance.yahoo.com/v8/finance/chart/"
                         + symbol
                         + "?range=7d&interval=1d";
-
+            //☆requst함수가 호출함!!!
         return request(apiUrl);
     }
 

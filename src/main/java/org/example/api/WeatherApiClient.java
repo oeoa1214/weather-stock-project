@@ -9,7 +9,7 @@ public final class WeatherApiClient {
 
     private WeatherApiClient() {
     }
-
+//날씨
     public static String getWeatherData() {
 
         String apiUrl =
@@ -26,7 +26,7 @@ public final class WeatherApiClient {
 
         return result;
     }
-
+//미세먼지
     public static String getAirQualityData() {
 
         String apiUrl =
@@ -53,17 +53,19 @@ public final class WeatherApiClient {
         try {
             URL url =
                     new URL(apiUrl);
-
+    //인터넷연결!!
             HttpURLConnection conn =
                     (HttpURLConnection) url.openConnection();
-
+  // 요청방식을 get으로 정함
             conn.setRequestMethod("GET");
+
+            //5초까지 기다려줌
             conn.setConnectTimeout(5000);
             conn.setReadTimeout(5000);
 
             int responseCode =
                     conn.getResponseCode();
-
+//200성공 404 주소몾찾음 500 서버오류 502 서버응답문제
             if (responseCode < 200 || responseCode >= 300) {
                 System.out.println(
                         "API 응답 실패: " + responseCode + " / " + apiUrl
