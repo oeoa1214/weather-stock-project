@@ -526,7 +526,9 @@ public class Class8AnalysisPanel extends JPanel {
         runningMode =
                 MODE_KOSPI;
 
-        appController.startKospiAverageMode();
+        appController.startKospiAverageMode(
+                getKospiFilePath()
+        );
 
         progressLabel.setText(
                 "KOSPI LAB · 0 / 0"
@@ -534,6 +536,9 @@ public class Class8AnalysisPanel extends JPanel {
 
         countArea.setText(
                 "KOSPI WEATHER COUNT\n"
+                        + "지역: "
+                        + regionName
+                        + "\n"
                         + "데이터를 불러오는 중입니다."
         );
 
@@ -556,7 +561,9 @@ public class Class8AnalysisPanel extends JPanel {
         runningMode =
                 MODE_TEMPERATURE;
 
-        appController.startKospiTemperatureMode();
+        appController.startKospiTemperatureMode(
+                getKospiFilePath()
+        );
 
         progressLabel.setText(
                 "TEMP LAB · 0 / 0"
@@ -564,6 +571,9 @@ public class Class8AnalysisPanel extends JPanel {
 
         countArea.setText(
                 "TEMPERATURE COUNT\n"
+                        + "지역: "
+                        + regionName
+                        + "\n"
                         + "데이터를 불러오는 중입니다."
         );
 
@@ -838,5 +848,13 @@ public class Class8AnalysisPanel extends JPanel {
         }
 
         return builder.toString();
+    }
+
+    private String getKospiFilePath() {
+        if (regionName.equals("대구")) {
+            return "data/kospi_weather_2025.csv_dague";
+        }
+
+        return "data/kospi_weather_2025.csv";
     }
 }

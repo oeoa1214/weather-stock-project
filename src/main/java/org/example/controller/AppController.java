@@ -1,8 +1,9 @@
 package org.example.controller;
 
-import org.example.view.MainFrame;
 import org.example.model.*;
 import org.example.service.*;
+import org.example.util.ResultCsvSaver;
+import org.example.view.MainFrame;
 
 import java.util.List;
 import java.util.Map;
@@ -183,6 +184,40 @@ public class AppController {
                         judgedWeather.getName()
                 );
 
+        ResultCsvSaver.savePanel1Weather(
+                class1.condition().getName(),
+                class1.temperature(),
+                class1.humidity(),
+                class1.precipitation(),
+                class1.windspeed(),
+                class1.pm10()
+        );
+
+        ResultCsvSaver.savePanel2Recommend(
+                class4.themeName(),
+                class4.stockName(),
+                class4.currentPrice(),
+                class4.returnRate(),
+                class4.reason()
+        );
+
+        ResultCsvSaver.savePanel9Food(
+                class9.weatherName(),
+                class9.foodName(),
+                class9.reasons()
+        );
+
+        ResultCsvSaver.saveFinalDashboardHistory(
+                class1.condition().getName(),
+                class1.temperature(),
+                class1.pm10(),
+                class4.themeName(),
+                class4.stockName(),
+                class4.currentPrice(),
+                class4.returnRate(),
+                class9.foodName()
+        );
+
         new MainFrame(
                 class1,
                 class4,
@@ -302,11 +337,19 @@ public class AppController {
     }
 
     public void startKospiAverageMode() {
+        startKospiAverageMode(
+                "data/kospi_weather_2025.csv"
+        );
+    }
+
+    public void startKospiAverageMode(
+            String filePath
+    ) {
         kospiAverageMode =
                 true;
 
         kospiWeatherAverageController.start(
-                "data/kospi_weather_2025.csv"
+                filePath
         );
 
         run5Service.resetDummy();
@@ -354,12 +397,21 @@ public class AppController {
                         averageReturnMap
                 );
 
+        AnalysisProgressData progressData =
+                kospiWeatherAverageController.getProgressData();
+
         boolean finished =
                 kospiWeatherAverageController.isFinished();
 
         if (finished) {
             kospiAverageMode =
                     false;
+
+            ResultCsvSaver.savePanel6And8AnalysisResult(
+                    "KOSPI날씨분석",
+                    averageReturnMap,
+                    progressData.appliedCountMap()
+            );
         }
 
         return new KospiAverageStepResult(
@@ -369,7 +421,7 @@ public class AppController {
                 kospiWeatherAverageController.getCurrentDate(),
                 class5Result,
                 class6Result,
-                kospiWeatherAverageController.getProgressData()
+                progressData
         );
     }
 
@@ -394,11 +446,19 @@ public class AppController {
     }
 
     public void startKospiTemperatureMode() {
+        startKospiTemperatureMode(
+                "data/kospi_weather_2025.csv"
+        );
+    }
+
+    public void startKospiTemperatureMode(
+            String filePath
+    ) {
         kospiTemperatureMode =
                 true;
 
         kospiTemperatureAverageController.start(
-                "data/kospi_weather_2025.csv"
+                filePath
         );
 
         run6Service.resetDummy();
@@ -434,12 +494,21 @@ public class AppController {
                         averageReturnMap
                 );
 
+        AnalysisProgressData progressData =
+                kospiTemperatureAverageController.getProgressData();
+
         boolean finished =
                 kospiTemperatureAverageController.isFinished();
 
         if (finished) {
             kospiTemperatureMode =
                     false;
+
+            ResultCsvSaver.savePanel6And8AnalysisResult(
+                    "KOSPI기온분석",
+                    averageReturnMap,
+                    progressData.countMap()
+            );
         }
 
         return new KospiTemperatureStepResult(
@@ -447,7 +516,7 @@ public class AppController {
                 kospiTemperatureAverageController.getCurrentDay(),
                 kospiTemperatureAverageController.getTotalDay(),
                 class6Result,
-                kospiTemperatureAverageController.getProgressData()
+                progressData
         );
     }
 
@@ -489,10 +558,22 @@ public class AppController {
                         class6Result
                 );
 
-        return recommendRefreshService.createRecommendRefreshResult(
-                viewClass6,
-                lastHub3Items
+        RecommendRefreshResult refreshResult =
+                recommendRefreshService.createRecommendRefreshResult(
+                        viewClass6,
+                        lastHub3Items
+                );
+
+        ResultCsvSaver.saveRefreshDashboardHistory(
+                viewClass6.weatherName(),
+                viewClass6.themeName(),
+                refreshResult.class4().stockName(),
+                refreshResult.class4().currentPrice(),
+                refreshResult.class4().returnRate(),
+                refreshResult.class9().foodName()
         );
+
+        return refreshResult;
     }
 
     private themeMom createThemeByWeather(
